@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="th">
 
 <head>
@@ -235,20 +235,27 @@
       background: #2c3e50;
       color: #ecf0f1;
       padding: 15px 20px;
-      text-align: center;
       font-size: .9rem;
-      position: relative;
-      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    footer a {
+    footer .left {
+      font-weight: 500;
+    }
+
+    footer .right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .9rem;
+      color: #bdc3c7;
+    }
+
+    footer .right i {
       color: #3498db;
-      text-decoration: none;
-      margin: 0 5px;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
     }
 
     @media (max-width:768px) {
@@ -271,6 +278,12 @@
 
       .content {
         margin: 10px;
+      }
+
+      footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
       }
     }
   </style>
@@ -299,11 +312,10 @@
 
       <div class="menu-section">
         <div class="menu-title"><i class="fas fa-database"></i> ระบบจัดการข้อมูล</div>
-                 <a class="menu-item" onclick="loadSystem(event,'tractor','ระบบ Tractor')"><i class="fas fa-tractor"></i> ระบบ:เซ็นต์เอกสารออนไลน์</a>
+        <a class="menu-item" onclick="loadSystem(event,'tractor','ระบบ Tractor')"><i class="fas fa-tractor"></i> ระบบ:เซ็นต์เอกสารออนไลน์</a>
         <a class="menu-item" onclick="loadSystem(event,'checklist','ระบบ Checklist')"><i class="fas fa-check-square"></i> ระบบ:ตรวจเช็คType-A </a>
         <a class="menu-item" onclick="loadSystem(event,'picrai','ระบบ picrai')"><i class="fas fa-camera"></i> ระบบ DashBoardอ้อยเข้าหีบประจำวัน</a>
         <a class="menu-item" onclick="loadSystem(event,'edoc','ระบบ edoc')"><i class="fas fa-home"></i> ระบบ:บันทึก อล.TisSugar</a>
-        
       </div>
 
       <div class="menu-section">
@@ -311,7 +323,6 @@
         <a class="menu-item" onclick="loadSystem(event,'tispayroll','ระบบ ขอสลิปย้อนหลัง')"><i class="fas fa-money-bill-wave"></i> ระบบ:ขอสลิปย้อนหลัง</a>
         <a class="menu-item" onclick="loadSystem(event,'tishome','ระบบ tishome')"><i class="fas fa-home"></i> ระบบ:แจกเอกสาร-Qrcode</a>
         <a class="menu-item" onclick="loadSystem(event,'emailslipTis','ระบบ emailslipTis')"><i class="fas fa-envelope"></i> ระบบ ขอยื่นแก้ Email รับ Slip </a>
-        
       </div>
 
       <div class="menu-section">
@@ -351,11 +362,12 @@
   </div>
 
   <footer>
-    <p>© 2025 ศูนย์รวมระบบจัดการ | พัฒนาโดย ทีมงาน IT</p>
-    <p>
-      <a href="#">นโยบายความเป็นส่วนตัว</a> |
-      <a href="#">ติดต่อเรา</a>
-    </p>
+    <div class="left">
+      © 2025 บริษัท น้ำตาลไทยเอกลักษณ์ จำกัด | ศูนย์รวมระบบจัดการ
+    </div>
+    <div class="right">
+      <i class="fas fa-user-cog"></i> ผู้พัฒนา: Sw.Wittawat.K
+    </div>
   </footer>
 
   <script>
@@ -366,13 +378,16 @@
       'tractor': 'https://skywalker698.github.io/tractor/',
       'emailslipTis': 'https://skywalker698.github.io/emailslipTis/',
       'picrai': 'https://skywalker698.github.io/PicRai/',
-            'edoc': 'https://skywalker698.github.io/E-doc/'
+      'edoc': 'https://skywalker698.github.io/E-doc/'
     };
     let currentSystem = null;
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       updateTime();
       setInterval(updateTime, 1000);
       updateLastUpdate();
+
+      // โหลดหน้า PicRai โดยอัตโนมัติ
+      loadSystem(null, 'picrai', 'ระบบ DashBoardอ้อยเข้าหีบประจำวัน');
     });
 
     function updateTime() {
@@ -400,7 +415,7 @@
 
     function showWelcome(event) {
       document.querySelectorAll('.iframe-container').forEach(iframe => iframe.classList.remove('active'));
-      documen.getElementById('welcomeScreen').style.display = 'flex';
+      document.getElementById('welcomeScreen').style.display = 'flex';
       document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
       if (event) event.target.classList.add('active');
       document.getElementById('breadcrumb').innerHTML = 'หน้าหลัก > <span class="current">DashBoard</span>';
