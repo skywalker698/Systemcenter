@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ศูนย์รวมระบบจัดการ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', 'Prompt', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: #3498db;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .main-container {
+            display: flex;
+            margin-top: 80px;
+            height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-title {
+            background: #34495e;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .menu-item {
+            display: block;
+            padding: 15px 20px;
+            color: #2c3e50;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+        
+        .menu-item:hover {
+            background: #ecf0f1;
+            border-left-color: #3498db;
+            transform: translateX(5px);
+        }
+        
+        .menu-item.active {
+            background: #e8f4fd;
+            border-left-color: #2980b9;
+            color: #2980b9;
+            font-weight: 600;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        .content {
+            flex: 1;
+            background: white;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .welcome-screen i {
+            font-size: 5rem;
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-screen h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .welcome-screen p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+        
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+        
+        .iframe-container.active {
+            display: block;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-bar {
+            background: #34495e;
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .breadcrumb .current {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                transition: left 0.3s ease;
+                z-index: 999;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .content {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-cogs"></i>
+                <h1>ศูนย์รวมระบบจัดการ</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="currentUser">ผู้ใช้งาน</span>
+                <span>|</span>
+                <span id="currentTime"></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar" id="sidebar">
+            <div class="menu-section">
+                <div class="menu-title">
+                    <i class="fas fa-home"></i> หน้าหลัก
+                </div>
+                <a class="menu-item active" onclick="showWelcome()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    แดชบอร์ด
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">
+                    <i class="fas fa-database"></i> ระบบจัดการข้อมูล
+                </div>
+                <a class="menu-item" onclick="loadSystem('checklist', 'ระบบ Checklist')">
+                    <i class="fas fa-check-square"></i>
+                    ระบบ Checklist
+                </a>
+                <a class="menu-item" onclick="loadSystem('tipspayroll', 'ระบบ Tips Payroll')">
+                    <i class="fas fa-money-bill-wave"></i>
+                    ระบบ Tips Payroll
+                </a>
+                <a class="menu-item" onclick="loadSystem('fishome', 'ระบบ Fis Home')">
+                    <i class="fas fa-home"></i>
+                    ระบบ Fis Home
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">
+                    <i class="fas fa-tools"></i> เครื่องมือ
+                </div>
+                <a class="menu-item" onclick="loadSystem('tractor', 'ระบบ Tractor')">
+                    <i class="fas fa-tractor"></i>
+                    ระบบ Tractor
+                </a>
+                <a class="menu-item" onclick="loadSystem('emailsiptis', 'ระบบ Email SipTis')">
+                    <i class="fas fa-envelope"></i>
+                    ระบบ Email SipTis
+                </a>
+                <a class="menu-item" onclick="loadSystem('picra', 'ระบบ PicRa')">
+                    <i class="fas fa-camera"></i>
+                    ระบบ PicRa
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">
+                    <i class="fas fa-cog"></i> ตั้งค่าระบบ
+                </div>
+                <a class="menu-item" onclick="showSettings()">
+                    <i class="fas fa-sliders-h"></i>
+                    การตั้งค่า
+                </a>
+                <a class="menu-item" onclick="showHelp()">
+                    <i class="fas fa-question-circle"></i>
+                    ช่วยเหลือ
+                </a>
+            </div>
+        </nav>
+
+        <main class="content">
+            <div class="breadcrumb" id="breadcrumb">
+                หน้าหลัก > <span class="current">แดชบอร์ด</span>
+            </div>
+
+            <div class="welcome-screen" id="welcomeScreen">
+                <i class="fas fa-desktop"></i>
+                <h2>ยินดีต้อนรับสู่ศูนย์รวมระบบจัดการ</h2>
+                <p>เลือกระบบที่ต้องการใช้งานจากเมนูด้านซ้าย<br>
+                ระบบจะแสดงในหน้าต่างนี้โดยอัตโนมัติ</p>
+                <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; color: #28a745; margin-bottom: 10px;"></i>
+                        <h4>ระบบพร้อมใช้งาน</h4>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #17a2b8; margin-bottom: 10px;"></i>
+                        <h4>ปลอดภัย</h4>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <i class="fas fa-clock" style="font-size: 2rem; color: #ffc107; margin-bottom: 10px;"></i>
+                        <h4>24/7</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #666;">กำลังโหลด...</p>
+            </div>
+
+            <!-- iframes for different systems -->
+            <iframe id="iframe-checklist" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-tipspayroll" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-fishome" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-tractor" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-emailsiptis" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-picra" class="iframe-container" src=""></iframe>
+
+            <div class="status-bar">
+                <span id="systemStatus">สถานะ: พร้อมใช้งาน</span>
+                <span id="lastUpdate">อัพเดทล่าสุด: <span id="updateTime"></span></span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // System URLs - แก้ไข URL เหล่านี้ให้ตรงกับ Deploy URL ของ GAS จริง
+        const systemUrls = {
+            'checklist': 'https://skywalker698.github.io/checklist/',
+            'tipspayroll': 'https://skywalker698.github.io/Tipspayroll/',
+            'fishome': 'https://skywalker698.github.io/fishome/',
+            'tractor': 'https://skywalker698.github.io/tractor/',
+            'emailsiptis': 'https://skywalker698.github.io/emailSipTis/',
+            'picra': 'https://skywalker698.github.io/PicRa/'
+        };
+
+        let currentSystem = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            updateLastUpdate();
+        });
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('updateTime').textContent = timeString;
+        }
+
+        function showWelcome() {
+            // Hide all iframes
+            document.querySelectorAll('.iframe-container').forEach(iframe => {
+                iframe.classList.remove('active');
+            });
+            
+            // Show welcome screen
+            document.getElementById('welcomeScreen').style.display = 'flex';
+            
+            // Update menu active state
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update breadcrumb
+            document.getElementById('breadcrumb').innerHTML = 'หน้าหลัก > <span class="current">แดชบอร์ด</span>';
+            
+            // Update status
+            document.getElementById('systemStatus').textContent = 'สถานะ: พร้อมใช้งาน';
+            
+            currentSystem = null;
+        }
+
+        function loadSystem(systemId, systemName) {
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('welcomeScreen').style.display = 'none';
+            
+            // Hide all iframes first
+            document.querySelectorAll('.iframe-container').forEach(iframe => {
+                iframe.classList.remove('active');
+            });
+
+            // Update menu active state
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update breadcrumb
+            document.getElementById('breadcrumb').innerHTML = `หน้าหลัก > ระบบจัดการ > <span class="current">${systemName}</span>`;
+
+            // Update status
+            document.getElementById('systemStatus').textContent = `สถานะ: กำลังโหลด ${systemName}`;
+
+            const iframe = document.getElementById(`iframe-${systemId}`);
+            
+            // Set iframe source if not already set
+            if (!iframe.src) {
+                iframe.src = systemUrls[systemId] || '#';
+            }
+
+            // Show iframe after a short delay
+            setTimeout(() => {
+                document.getElementById('loading').classList.remove('show');
+                iframe.classList.add('active');
+                document.getElementById('systemStatus').textContent = `สถานะ: ${systemName} พร้อมใช้งาน`;
+                updateLastUpdate();
+            }, 1000);
+
+            currentSystem = systemId;
+        }
+
+        function showSettings() {
+            alert('ฟังก์ชันการตั้งค่าจะเพิ่มในเวอร์ชันถัดไป');
+        }
+
+        function showHelp() {
+            alert('หากต้องการความช่วยเหลือ กรุณาติดต่อผู้ดูแลระบบ');
+        }
+
+        // Handle iframe load events
+        document.querySelectorAll('.iframe-container').forEach(iframe => {
+            iframe.addEventListener('load', function() {
+                document.getElementById('loading').classList.remove('show');
+            });
+
+            iframe.addEventListener('error', function() {
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('systemStatus').textContent = 'สถานะ: เกิดข้อผิดพลาดในการโหลด';
+            });
+        });
+
+        // Mobile menu toggle (if needed)
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !event.target.closest('.menu-toggle')) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
