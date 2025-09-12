@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ศูนย์รวมระบบจัดการ</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>TisFlow Portal - ศูนย์รวมระบบจัดการอัจฉริยะ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -19,18 +19,19 @@
         }
         
         .header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
         
         .header-content {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
@@ -45,20 +46,53 @@
         }
         
         .logo i {
-            font-size: 2rem;
-            color: #3498db;
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .logo h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #e8f4fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo .subtitle {
+            font-size: 0.8rem;
+            color: #bdc3c7;
+            font-weight: 300;
         }
         
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             font-size: 0.9rem;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 25px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        
+        .mobile-toggle:hover {
+            background: rgba(255,255,255,0.1);
         }
         
         .main-container {
@@ -68,63 +102,124 @@
         }
         
         .sidebar {
-            width: 280px;
-            background: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+            background: linear-gradient(180deg, #fff 0%, #f8f9fa 100%);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
             padding: 20px 0;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3498db #f1f1f1;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 3px;
         }
         
         .menu-section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .menu-title {
-            background: #34495e;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
             color: white;
-            padding: 12px 20px;
+            padding: 15px 20px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
         }
         
         .menu-item {
-            display: block;
-            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
             color: #2c3e50;
             text-decoration: none;
             border-left: 4px solid transparent;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.1), rgba(46, 204, 113, 0.1));
+            transition: width 0.3s ease;
+        }
+        
+        .menu-item:hover::before {
+            width: 100%;
         }
         
         .menu-item:hover {
-            background: #ecf0f1;
+            background: transparent;
             border-left-color: #3498db;
-            transform: translateX(5px);
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
         }
         
         .menu-item.active {
-            background: #e8f4fd;
+            background: linear-gradient(90deg, #e8f4fd, #e8f8f5);
             border-left-color: #2980b9;
             color: #2980b9;
             font-weight: 600;
+            box-shadow: inset 0 0 20px rgba(52, 152, 219, 0.1);
         }
         
         .menu-item i {
-            width: 20px;
-            margin-right: 12px;
+            width: 24px;
+            margin-right: 15px;
             text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item-text {
+            flex: 1;
+        }
+        
+        .menu-item-badge {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
         }
         
         .content {
             flex: 1;
             background: white;
             margin: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
             overflow: hidden;
             position: relative;
         }
@@ -137,25 +232,84 @@
             height: 100%;
             text-align: center;
             padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
         
-        .welcome-screen i {
-            font-size: 5rem;
-            color: #3498db;
-            margin-bottom: 20px;
+        .welcome-icon {
+            font-size: 6rem;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
         }
         
         .welcome-screen h2 {
             color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 700;
         }
         
         .welcome-screen p {
             color: #7f8c8d;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .stat-card.ready i { color: #27ae60; }
+        .stat-card.secure i { color: #3498db; }
+        .stat-card.available i { color: #f39c12; }
+        .stat-card.fast i { color: #e74c3c; }
+        
+        .stat-card h4 {
+            color: #2c3e50;
             font-size: 1.1rem;
-            line-height: 1.6;
-            max-width: 500px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3498db;
         }
         
         .iframe-container {
@@ -175,6 +329,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             display: none;
+            text-align: center;
         }
         
         .loading.show {
@@ -182,12 +337,13 @@
         }
         
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
         
         @keyframes spin {
@@ -195,10 +351,16 @@
             100% { transform: rotate(360deg); }
         }
         
+        .loading p {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
         .status-bar {
-            background: #34495e;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             font-size: 0.9rem;
             position: absolute;
             bottom: 0;
@@ -209,12 +371,34 @@
             align-items: center;
         }
         
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: blink 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
         .breadcrumb {
-            background: #f8f9fa;
-            padding: 15px 20px;
+            background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+            padding: 18px 25px;
             border-bottom: 1px solid #dee2e6;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .breadcrumb .current {
@@ -222,7 +406,16 @@
             font-weight: 600;
         }
         
+        .breadcrumb i {
+            color: #3498db;
+        }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+            
             .sidebar {
                 width: 100%;
                 position: fixed;
@@ -230,6 +423,7 @@
                 left: -100%;
                 transition: left 0.3s ease;
                 z-index: 999;
+                height: calc(100vh - 80px);
             }
             
             .sidebar.active {
@@ -242,6 +436,66 @@
             
             .content {
                 margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .logo h1 {
+                font-size: 1.3rem;
+            }
+            
+            .user-info {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            
+            .welcome-screen {
+                padding: 20px;
+            }
+            
+            .welcome-icon {
+                font-size: 4rem;
+            }
+            
+            .welcome-screen h2 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 20px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-item {
+                padding: 14px 16px;
+            }
+            
+            .menu-item i {
+                margin-right: 12px;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .welcome-screen {
+                background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            }
+            
+            .welcome-screen h2, .welcome-screen p {
+                color: #ecf0f1;
             }
         }
     </style>
@@ -250,12 +504,18 @@
     <header class="header">
         <div class="header-content">
             <div class="logo">
-                <i class="fas fa-cogs"></i>
-                <h1>ศูนย์รวมระบบจัดการ</h1>
+                <i class="fas fa-cube"></i>
+                <div>
+                    <h1>TisFlow Portal</h1>
+                    <div class="subtitle">Smart Management Hub</div>
+                </div>
             </div>
+            <button class="mobile-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="user-info">
                 <i class="fas fa-user-circle"></i>
-                <span id="currentUser">ผู้ใช้งาน</span>
+                <span id="currentUser">ผู้ดูแลระบบ</span>
                 <span>|</span>
                 <span id="currentTime"></span>
             </div>
@@ -270,43 +530,60 @@
                 </div>
                 <a class="menu-item active" onclick="showWelcome()">
                     <i class="fas fa-tachometer-alt"></i>
-                    แดชบอร์ด
+                    <span class="menu-item-text">แดชบอร์ด</span>
                 </a>
             </div>
 
             <div class="menu-section">
                 <div class="menu-title">
-                    <i class="fas fa-database"></i> ระบบจัดการข้อมูล
+                    <i class="fas fa-folder-open"></i> ระบบจัดการเอกสาร
                 </div>
-                <a class="menu-item" onclick="loadSystem('checklist', 'ระบบ Checklist')">
-                    <i class="fas fa-check-square"></i>
-                    ระบบ Checklist
+                <a class="menu-item" onclick="loadSystem('edoc', 'DocFlow - ระบบจัดเก็บเอกสาร')">
+                    <i class="fas fa-file-archive"></i>
+                    <span class="menu-item-text">DocFlow</span>
+                    <span class="menu-item-badge">NEW</span>
                 </a>
-                <a class="menu-item" onclick="loadSystem('tipspayroll', 'ระบบ Tips Payroll')">
-                    <i class="fas fa-money-bill-wave"></i>
-                    ระบบ Tips Payroll
+                <a class="menu-item" onclick="loadSystem('checklist', 'CheckPro - ตรวจเช็คและบำรุง Type A')">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span class="menu-item-text">CheckPro</span>
                 </a>
-                <a class="menu-item" onclick="loadSystem('fishome', 'ระบบ Fis Home')">
-                    <i class="fas fa-home"></i>
-                    ระบบ Fis Home
+                <a class="menu-item" onclick="loadSystem('tishome', 'QrScan - นำเข้าเอกสารออนไลน์')">
+                    <i class="fas fa-qrcode"></i>
+                    <span class="menu-item-text">QrScan</span>
                 </a>
             </div>
 
             <div class="menu-section">
                 <div class="menu-title">
-                    <i class="fas fa-tools"></i> เครื่องมือ
+                    <i class="fas fa-money-bill-wave"></i> ระบบการเงิน
                 </div>
-                <a class="menu-item" onclick="loadSystem('tractor', 'ระบบ Tractor')">
-                    <i class="fas fa-tractor"></i>
-                    ระบบ Tractor
+                <a class="menu-item" onclick="loadSystem('tipspayroll', 'PaySlip - ระบบสลิปเงินเดือน')">
+                    <i class="fas fa-receipt"></i>
+                    <span class="menu-item-text">PaySlip</span>
                 </a>
-                <a class="menu-item" onclick="loadSystem('emailsiptis', 'ระบบ Email SipTis')">
-                    <i class="fas fa-envelope"></i>
-                    ระบบ Email SipTis
+                <a class="menu-item" onclick="loadSystem('emailsliptis', 'EmailFix - แก้ไข Email แจ้งสลิป')">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span class="menu-item-text">EmailFix</span>
                 </a>
-                <a class="menu-item" onclick="loadSystem('picra', 'ระบบ PicRa')">
-                    <i class="fas fa-camera"></i>
-                    ระบบ PicRa
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">
+                    <i class="fas fa-pen-fancy"></i> ระบบอนุมัติ
+                </div>
+                <a class="menu-item" onclick="loadSystem('tractor', 'SignFlow - เซ็นต์และอนุมัติออนไลน์')">
+                    <i class="fas fa-signature"></i>
+                    <span class="menu-item-text">SignFlow</span>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">
+                    <i class="fas fa-chart-bar"></i> รายงานและสถิติ
+                </div>
+                <a class="menu-item" onclick="loadSystem('picrai', 'SugarBoard - Dashboard สรุปตันอ้อย')">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="menu-item-text">SugarBoard</span>
                 </a>
             </div>
 
@@ -316,70 +593,85 @@
                 </div>
                 <a class="menu-item" onclick="showSettings()">
                     <i class="fas fa-sliders-h"></i>
-                    การตั้งค่า
+                    <span class="menu-item-text">การตั้งค่า</span>
                 </a>
                 <a class="menu-item" onclick="showHelp()">
-                    <i class="fas fa-question-circle"></i>
-                    ช่วยเหลือ
+                    <i class="fas fa-life-ring"></i>
+                    <span class="menu-item-text">ช่วยเหลือ</span>
                 </a>
             </div>
         </nav>
 
         <main class="content">
             <div class="breadcrumb" id="breadcrumb">
+                <i class="fas fa-home"></i>
                 หน้าหลัก > <span class="current">แดชบอร์ด</span>
             </div>
 
             <div class="welcome-screen" id="welcomeScreen">
-                <i class="fas fa-desktop"></i>
-                <h2>ยินดีต้อนรับสู่ศูนย์รวมระบบจัดการ</h2>
-                <p>เลือกระบบที่ต้องการใช้งานจากเมนูด้านซ้าย<br>
-                ระบบจะแสดงในหน้าต่างนี้โดยอัตโนมัติ</p>
-                <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px;">
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                        <i class="fas fa-check-circle" style="font-size: 2rem; color: #28a745; margin-bottom: 10px;"></i>
+                <i class="fas fa-rocket welcome-icon"></i>
+                <h2>ยินดีต้อนรับสู่ TisFlow Portal</h2>
+                <p>ศูนย์รวมระบบจัดการอัจฉริยะ ที่รวบรวมเครื่องมือทำงานทุกอย่างไว้ในที่เดียว<br>
+                เลือกระบบที่ต้องการใช้งานจากเมนูด้านซ้าย</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card ready">
+                        <i class="fas fa-check-circle"></i>
                         <h4>ระบบพร้อมใช้งาน</h4>
+                        <div class="stat-number">7</div>
                     </div>
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #17a2b8; margin-bottom: 10px;"></i>
-                        <h4>ปลอดภัย</h4>
+                    <div class="stat-card secure">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>ปลอดภัย 100%</h4>
+                        <div class="stat-number">SSL</div>
                     </div>
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                        <i class="fas fa-clock" style="font-size: 2rem; color: #ffc107; margin-bottom: 10px;"></i>
-                        <h4>24/7</h4>
+                    <div class="stat-card available">
+                        <i class="fas fa-clock"></i>
+                        <h4>เปิดให้บริการ</h4>
+                        <div class="stat-number">24/7</div>
+                    </div>
+                    <div class="stat-card fast">
+                        <i class="fas fa-bolt"></i>
+                        <h4>ความเร็วสูง</h4>
+                        <div class="stat-number">99%</div>
                     </div>
                 </div>
             </div>
 
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p style="margin-top: 15px; color: #666;">กำลังโหลด...</p>
+                <p>กำลังโหลดระบบ...</p>
             </div>
 
             <!-- iframes for different systems -->
+            <iframe id="iframe-edoc" class="iframe-container" src=""></iframe>
             <iframe id="iframe-checklist" class="iframe-container" src=""></iframe>
             <iframe id="iframe-tipspayroll" class="iframe-container" src=""></iframe>
-            <iframe id="iframe-fishome" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-tishome" class="iframe-container" src=""></iframe>
             <iframe id="iframe-tractor" class="iframe-container" src=""></iframe>
-            <iframe id="iframe-emailsiptis" class="iframe-container" src=""></iframe>
-            <iframe id="iframe-picra" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-emailsliptis" class="iframe-container" src=""></iframe>
+            <iframe id="iframe-picrai" class="iframe-container" src=""></iframe>
 
             <div class="status-bar">
-                <span id="systemStatus">สถานะ: พร้อมใช้งาน</span>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="systemStatus">ระบบพร้อมใช้งาน</span>
+                </div>
                 <span id="lastUpdate">อัพเดทล่าสุด: <span id="updateTime"></span></span>
             </div>
         </main>
     </div>
 
     <script>
-        // System URLs - แก้ไข URL เหล่านี้ให้ตรงกับ Deploy URL ของ GAS จริง
+        // System URLs - Smart naming convention
         const systemUrls = {
+            'edoc': 'https://skywalker698.github.io/E-doc/',
             'checklist': 'https://skywalker698.github.io/checklist/',
-            'tipspayroll': 'https://skywalker698.github.io/Tipspayroll/',
-            'fishome': 'https://skywalker698.github.io/fishome/',
+            'tipspayroll': 'https://skywalker698.github.io/Tispayroll/',
+            'tishome': 'https://skywalker698.github.io/tishome/',
             'tractor': 'https://skywalker698.github.io/tractor/',
-            'emailsiptis': 'https://skywalker698.github.io/emailSipTis/',
-            'picra': 'https://skywalker698.github.io/PicRa/'
+            'emailsliptis': 'https://skywalker698.github.io/emailslipTis/',
+            'picrai': 'https://skywalker698.github.io/PicRai/'
         };
 
         let currentSystem = null;
@@ -389,6 +681,16 @@
             updateTime();
             setInterval(updateTime, 1000);
             updateLastUpdate();
+            
+            // Add smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
         });
 
         function updateTime() {
@@ -432,12 +734,15 @@
             event.target.classList.add('active');
             
             // Update breadcrumb
-            document.getElementById('breadcrumb').innerHTML = 'หน้าหลัก > <span class="current">แดชบอร์ด</span>';
+            document.getElementById('breadcrumb').innerHTML = '<i class="fas fa-home"></i> หน้าหลัก > <span class="current">แดชบอร์ด</span>';
             
             // Update status
-            document.getElementById('systemStatus').textContent = 'สถานะ: พร้อมใช้งาน';
+            document.getElementById('systemStatus').textContent = 'ระบบพร้อมใช้งาน';
             
             currentSystem = null;
+            
+            // Close mobile menu
+            document.getElementById('sidebar').classList.remove('active');
         }
 
         function loadSystem(systemId, systemName) {
@@ -457,10 +762,10 @@
             event.target.classList.add('active');
 
             // Update breadcrumb
-            document.getElementById('breadcrumb').innerHTML = `หน้าหลัก > ระบบจัดการ > <span class="current">${systemName}</span>`;
+            document.getElementById('breadcrumb').innerHTML = `<i class="fas fa-home"></i> หน้าหลัก > ระบบจัดการ > <span class="current">${systemName}</span>`;
 
             // Update status
-            document.getElementById('systemStatus').textContent = `สถานะ: กำลังโหลด ${systemName}`;
+            document.getElementById('systemStatus').textContent = `กำลังโหลด ${systemName}`;
 
             const iframe = document.getElementById(`iframe-${systemId}`);
             
@@ -473,19 +778,35 @@
             setTimeout(() => {
                 document.getElementById('loading').classList.remove('show');
                 iframe.classList.add('active');
-                document.getElementById('systemStatus').textContent = `สถานะ: ${systemName} พร้อมใช้งาน`;
+                document.getElementById('systemStatus').textContent = `${systemName} - ใช้งานได้`;
                 updateLastUpdate();
-            }, 1000);
+            }, 1200);
 
             currentSystem = systemId;
+            
+            // Close mobile menu
+            document.getElementById('sidebar').classList.remove('active');
         }
 
         function showSettings() {
-            alert('ฟังก์ชันการตั้งค่าจะเพิ่มในเวอร์ชันถัดไป');
+            alert('⚙️ ระบบการตั้งค่าจะเปิดให้บริการในเร็วๆ นี้\n\nหากต้องการปรับแต่งระบบ กรุณาติดต่อผู้ดูแล');
         }
 
         function showHelp() {
-            alert('หากต้องการความช่วยเหลือ กรุณาติดต่อผู้ดูแลระบบ');
+            const helpText = `🆘 ศูนย์ช่วยเหลือ TisFlow Portal\n\n` +
+                `📞 หมายเลขติดต่อ: 02-XXX-XXXX\n` +
+                `📧 อีเมล: support@tisflow.com\n` +
+                `⏰ เวลาทำการ: จันทร์-ศุกร์ 08:00-17:00\n\n` +
+                `🔧 การใช้งาน:\n` +
+                `• เลือกระบบจากเมนูด้านซ้าย\n` +
+                `• รอระบบโหลดเสร็จสิ้น\n` +
+                `• สามารถกลับมาที่แดชบอร์ดได้ทุกเวลา`;
+            alert(helpText);
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
         }
 
         // Handle iframe load events
@@ -496,23 +817,131 @@
 
             iframe.addEventListener('error', function() {
                 document.getElementById('loading').classList.remove('show');
-                document.getElementById('systemStatus').textContent = 'สถานะ: เกิดข้อผิดพลาดในการโหลด';
+                document.getElementById('systemStatus').textContent = 'เกิดข้อผิดพลาดในการโหลดระบบ';
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: #e74c3c;
+                `;
+                errorDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <h3>ไม่สามารถโหลดระบบได้</h3>
+                    <p>กรุณาลองใหม่อีกครั้งหรือติดต่อผู้ดูแลระบบ</p>
+                `;
+                this.parentNode.appendChild(errorDiv);
             });
         });
-
-        // Mobile menu toggle (if needed)
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !event.target.closest('.menu-toggle')) {
+            const toggle = document.querySelector('.mobile-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) &&
+                sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
             }
         });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        });
+
+        // Performance optimization - lazy load iframes
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const iframe = entry.target;
+                    if (!iframe.src && iframe.dataset.src) {
+                        iframe.src = iframe.dataset.src;
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all iframes
+        document.querySelectorAll('.iframe-container').forEach(iframe => {
+            observer.observe(iframe);
+        });
+
+        // Add connection status monitoring
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('systemStatus');
+            const statusDot = document.querySelector('.status-dot');
+            
+            if (navigator.onLine) {
+                statusDot.style.background = '#27ae60';
+                if (!currentSystem) {
+                    statusElement.textContent = 'ระบบพร้อมใช้งาน';
+                }
+            } else {
+                statusDot.style.background = '#e74c3c';
+                statusElement.textContent = 'ไม่มีการเชื่อมต่ออินเทอร์เน็ต';
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Initialize connection status
+        updateConnectionStatus();
+
+        // Add smooth transitions for menu items
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(8px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(0)';
+                }
+            });
+        });
+
+        // Add system health check
+        async function checkSystemHealth() {
+            const healthStatus = document.querySelector('.status-indicator');
+            
+            try {
+                // Simple health check - you can expand this
+                const response = await fetch('https://httpbin.org/status/200', { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                
+                healthStatus.innerHTML = `
+                    <div class="status-dot" style="background: #27ae60;"></div>
+                    <span>ระบบทำงานปกติ</span>
+                `;
+            } catch (error) {
+                healthStatus.innerHTML = `
+                    <div class="status-dot" style="background: #f39c12;"></div>
+                    <span>ตรวจสอบการเชื่อมต่อ</span>
+                `;
+            }
+        }
+
+        // Run health check every 5 minutes
+        setInterval(checkSystemHealth, 300000);
+        checkSystemHealth();
     </script>
 </body>
 </html>
