@@ -6,109 +6,83 @@
   <title>ศูนย์รวมระบบจัดการ</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* ===== Reset & Body ===== */
+    /* ======= Reset & Body ======= */
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Sarabun','Prompt',Arial,sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; display:flex; flex-direction:column; }
 
-    /* ===== Header ===== */
+    /* ======= Header ======= */
     .header { background:#2c3e50; color:white; padding:15px 0; box-shadow:0 2px 10px rgba(0,0,0,0.1); position:fixed; width:100%; top:0; z-index:1000; }
-    .header-content { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-    .logo { display:flex; align-items:center; gap:15px; flex-wrap:wrap; }
+    .header-content { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; justify-content:space-between; align-items:center; }
+    .logo { display:flex; align-items:center; gap:15px; }
     .logo i { font-size:2rem; color:#3498db; }
-    .logo h1 { font-size:1.4rem; font-weight:600; }
-    .user-info { display:flex; align-items:center; gap:10px; font-size:.9rem; flex-wrap:wrap; }
+    .logo h1 { font-size:1.5rem; font-weight:600; }
+    .user-info { display:flex; align-items:center; gap:10px; font-size:.9rem; }
+    #hamburgerBtn { display:none; font-size:1.5rem; cursor:pointer; }
 
-    /* ปุ่ม Hamburger */
-    .hamburger {
-      display:none;
-      background:none;
-      border:none;
-      color:white;
-      font-size:1.5rem;
-      cursor:pointer;
-    }
-
-    /* ===== Layout ===== */
+    /* ======= Layout ======= */
     .main-container { display:flex; margin-top:80px; flex:1; min-height:calc(100vh - 80px - 60px); }
-    .sidebar { width:280px; background:white; box-shadow:2px 0 10px rgba(0,0,0,0.1); padding:20px 0; overflow-y:auto; transition:left .3s ease; }
+    .sidebar { width:280px; background:white; box-shadow:2px 0 10px rgba(0,0,0,0.1); padding:20px 0; overflow-y:auto; }
     .menu-section { margin-bottom:30px; }
     .menu-title { background:#34495e; color:white; padding:12px 20px; font-weight:600; font-size:.95rem; text-transform:uppercase; letter-spacing:1px; }
     .menu-item { display:block; padding:15px 20px; color:#2c3e50; text-decoration:none; border-left:4px solid transparent; transition:all .3s ease; cursor:pointer; background:white; }
     .menu-item:hover { background:#ecf0f1; border-left-color:#3498db; transform:translateX(5px); }
     .menu-item.active { background:#e8f4fd; border-left-color:#2980b9; color:#2980b9; font-weight:600; }
     .menu-item i { width:20px; margin-right:12px; text-align:center; }
-
-    .content { flex:1; background:white; margin:20px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1); overflow:hidden; position:relative; display:flex; flex-direction:column; min-height:0; }
-
-    .breadcrumb { background:#f8f9fa; padding:15px 20px; border-bottom:1px solid #dee2e6; font-size:.9rem; color:#6c757d; flex-shrink:0; }
+    .content { flex:1; background:white; margin:20px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1); overflow:hidden; position:relative; display:flex; flex-direction:column; }
+    .breadcrumb { background:#f8f9fa; padding:15px 20px; border-bottom:1px solid #dee2e6; font-size:.9rem; color:#6c757d; }
     .breadcrumb .current { color:#2c3e50; font-weight:600; }
 
-    /* ===== Welcome ===== */
+    /* ======= Welcome ======= */
     .welcome-screen { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; }
     .welcome-screen i { font-size:5rem; color:#3498db; margin-bottom:20px; }
     .welcome-screen h2 { color:#2c3e50; margin-bottom:15px; font-size:1.8rem; }
     .welcome-screen p { color:#7f8c8d; font-size:1.1rem; line-height:1.6; max-width:500px; }
 
-    /* ===== Iframe ===== */
-    .iframe-container {
-      width:100%;
-      flex:1;
-      border:none;
-      display:none;
-      height:100%;
-    }
+    /* ======= Iframe ======= */
+    .iframe-container { width:100%; flex:1; border:none; display:none; padding:20px; overflow:auto; }
     .iframe-container.active { display:block; }
 
-    /* ===== Loading ===== */
+    /* ======= Loading ======= */
     .loading { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; text-align:center; }
     .loading.show { display:block; }
     .spinner { width:50px; height:50px; border:5px solid #f3f3f3; border-top:5px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; }
     @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
-    /* ===== Status Bar ===== */
-    .status-bar { background:#34495e; color:white; padding:10px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px; flex-shrink:0; }
+    /* ======= Status Bar ======= */
+    .status-bar { background:#34495e; color:white; padding:10px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; }
 
-    /* ===== Footer ===== */
-    footer { background:#2c3e50; color:#ecf0f1; padding:15px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+    /* ======= Footer ======= */
+    footer { background:#2c3e50; color:#ecf0f1; padding:15px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
     footer .left { font-weight:500; }
     footer .right { display:flex; align-items:center; gap:8px; font-size:.9rem; color:#bdc3c7; }
     footer .right i { color:#3498db; }
 
-    /* ===== Table ===== */
+    /* ======= Table Styles ======= */
     #statsContent table { width:100%; border-collapse:collapse; margin-top:15px; font-size:.95rem; }
     #statsContent th, #statsContent td { padding:10px; text-align:left; border:1px solid #ddd; }
     #statsContent th { background:#3498db; color:white; }
     #statsContent tr:nth-child(even) { background:#f2f2f2; }
     #statsContent tr:hover { background:#d0ebff; }
 
-    /* ===== Responsive ===== */
-    @media (max-width:1024px) {
-      .header-content { flex-direction:row; justify-content:space-between; }
-    }
+    /* ======= Responsive ======= */
     @media (max-width:768px) {
-      .hamburger { display:block; }
-      .sidebar { width:100%; position:fixed; top:80px; left:-100%; z-index:999; height:calc(100% - 80px); }
+      #hamburgerBtn { display:block; color:white; }
+      .sidebar { width:80%; max-width:280px; position:fixed; top:80px; left:-100%; transition:left .3s ease; z-index:999; height:calc(100vh - 80px); }
       .sidebar.active { left:0; }
       .main-container { flex-direction:column; }
-      .content { margin:10px; height:auto; }
-      .breadcrumb { font-size:.85rem; padding:10px; }
-      footer { flex-direction:column; text-align:center; }
-    }
-    @media (max-width:480px) {
-      .logo h1 { font-size:1.1rem; }
-      .welcome-screen h2 { font-size:1.4rem; }
-      .welcome-screen p { font-size:1rem; }
+      .content { margin:10px; }
+      footer { flex-direction:column; text-align:center; gap:5px; }
     }
   </style>
 </head>
 <body>
   <header class="header">
     <div class="header-content">
-      <!-- ปุ่ม Hamburger -->
-      <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></button>
-
       <div class="logo"><i class="fas fa-cogs"></i><h1>ศูนย์รวมระบบจัดการ</h1></div>
-      <div class="user-info"><i class="fas fa-user-circle"></i><span id="currentUser">ผู้ใช้งาน</span> | <span id="currentTime"></span></div>
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i><span id="currentUser">ผู้ใช้งาน</span> | <span id="currentTime"></span>
+        <span id="hamburgerBtn">&#9776;</span>
+      </div>
     </div>
   </header>
 
@@ -188,6 +162,8 @@
   </footer>
 
   <script>
+    const statsApi = "https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec";
+
     const systemUrls = {
       'checklist': 'https://skywalker698.github.io/checklist/',
       'tispayroll': 'https://skywalker698.github.io/Tispayroll/',
@@ -199,7 +175,6 @@
       'dash': 'https://skywalker698.github.io/DachTissugar/'
     };
 
-    const statsApi = "https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec";
     let currentSystem = null;
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -227,6 +202,7 @@
       document.getElementById('breadcrumb').innerHTML='หน้าหลัก > <span class="current">DashBoard</span>';
       document.getElementById('systemStatus').textContent='สถานะ: พร้อมใช้งาน';
       currentSystem=null;
+      if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
     }
 
     async function loadSystem(event, systemId, systemName) {
@@ -248,7 +224,6 @@
       },1000);
       currentSystem=systemId;
 
-      // ปิด Sidebar อัตโนมัติบนมือถือ
       if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
     }
 
@@ -265,31 +240,47 @@
       document.querySelectorAll('.iframe-container').forEach(f=>f.classList.remove('active'));
       const statsScreen=document.getElementById('statsScreen');
       statsScreen.classList.add('active');
-      document.getElementById('breadcrumb').innerHTML=`หน้าหลัก > <span class="current">สถิติการใช้งาน</span>`;
-      document.getElementById('systemStatus').textContent='สถานะ: กำลังโหลดสถิติ';
+      document.getElementById('breadcrumb').innerHTML='หน้าหลัก > <span class="current">สถิติการใช้งาน</span>';
+      document.getElementById('systemStatus').textContent='สถานะ: โหลดสถิติ...';
       const statsContent=document.getElementById('statsContent');
       statsContent.innerHTML='<p>⏳ กำลังโหลดข้อมูล...</p>';
+
       try{
-        const res=await fetch(statsApi);
-        const data=await res.json();
-        let html='<table><tr><th>ผู้ใช้งาน</th><th>หน้าที่เข้าใช้งาน</th><th>เวลา</th></tr>';
-        data.forEach(row=>{ html+=`<tr><td>${row.user}</td><td>${row.page}</td><td>${row.time}</td></tr>`; });
-        html+='</table>';
-        statsContent.innerHTML=html;
-        document.getElementById('systemStatus').textContent='สถานะ: แสดงสถิติเรียบร้อย';
+        const res = await fetch(statsApi + '?action=stats');
+        const data = await res.json();
+
+        let tableHtml = `<table>
+          <thead><tr><th>วันที่/เวลา</th><th>ผู้ใช้</th><th>ระบบ</th></tr></thead>
+          <tbody>`;
+
+        data.logs.forEach(log=>{
+          tableHtml += `<tr><td>${log.date}</td><td>${log.user}</td><td>${log.page}</td></tr>`;
+        });
+
+        tableHtml += `</tbody></table>`;
+
+        statsContent.innerHTML = `
+          <p><b>👥 ผู้ใช้งานทั้งหมด:</b> ${data.totalUsers} ครั้ง</p>
+          <p><b>📅 วันนี้:</b> ${data.todayUsers} ครั้ง</p>
+          ${tableHtml}
+        `;
+
+        document.getElementById('systemStatus').textContent='สถานะ: แสดงสถิติแล้ว';
       }catch(err){
-        console.error(err);
+        console.error("Stats Error:",err);
         statsContent.innerHTML='<p style="color:red;">❌ ไม่สามารถโหลดข้อมูลได้</p>';
-        document.getElementById('systemStatus').textContent='สถานะ: โหลดสถืติล้มเหลว';
+        document.getElementById('systemStatus').textContent='สถานะ: โหลดสถิติล้มเหลว';
       }
+
       updateLastUpdate();
 
-      // ปิด Sidebar อัตโนมัติบนมือถือ
       if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
     }
 
-    // Hamburger Toggle
-    document.getElementById('hamburgerBtn').addEventListener('click',()=>{ document.getElementById('sidebar').classList.toggle('active'); });
+    // Hamburger toggle
+    document.getElementById('hamburgerBtn').addEventListener('click', ()=>{
+      document.getElementById('sidebar').classList.toggle('active');
+    });
   </script>
 </body>
 </html>
