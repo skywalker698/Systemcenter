@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ศูนย์รวมระบบจัดการ</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -29,6 +29,7 @@
     .menu-item.active { background:#e8f4fd; border-left-color:#2980b9; color:#2980b9; font-weight:600; }
     .menu-item i { width:20px; margin-right:12px; text-align:center; }
     .content { flex:1; background:white; margin:20px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1); overflow:hidden; position:relative; display:flex; flex-direction:column; }
+
     .breadcrumb { background:#f8f9fa; padding:15px 20px; border-bottom:1px solid #dee2e6; font-size:.9rem; color:#6c757d; }
     .breadcrumb .current { color:#2c3e50; font-weight:600; }
 
@@ -39,14 +40,38 @@
     .welcome-screen p { color:#7f8c8d; font-size:1.1rem; line-height:1.6; max-width:500px; }
 
     /* ======= Iframe ======= */
-    .iframe-container { width:100%; flex:1; border:none; display:none; padding:20px; overflow:auto; }
-    .iframe-container.active { display:block; }
+    /* The iframe elements themselves have class "iframe-container" in your markup */
+    .iframe-container {
+      width:100%;
+      flex:1;
+      border:none;
+      display:none;
+      padding:0; /* we let iframe content handle inner padding */
+      overflow:auto;
+      /* ensure iframe can grow to fill available space and accept pointer events only when active */
+      height: calc(100vh - 80px - 60px - 40px); /* header 80 + footer ~60 + margins */
+      min-height: 300px;
+      position:relative;
+      z-index:1;
+      pointer-events: none; /* default: disabled until active */
+      background:transparent;
+    }
+    .iframe-container.active {
+      display:block;
+      pointer-events: auto; /* allow interaction only for active iframe */
+      z-index:5;
+    }
+    /* make sure focusable */
+    .iframe-container[tabindex] { outline: none; }
 
     /* ======= Loading ======= */
-    .loading { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; text-align:center; }
+    .loading { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; text-align:center; z-index:200; }
     .loading.show { display:block; }
     .spinner { width:50px; height:50px; border:5px solid #f3f3f3; border-top:5px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; }
     @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+
+    /* IMPORTANT: don't let the loading overlay block pointer events */
+    .loading, .loading * { pointer-events: none; }
 
     /* ======= Status Bar ======= */
     .status-bar { background:#34495e; color:white; padding:10px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; }
@@ -72,6 +97,9 @@
       .main-container { flex-direction:column; }
       .content { margin:10px; }
       footer { flex-direction:column; text-align:center; gap:5px; }
+
+      /* On small screens increase iframe min-height a bit */
+      .iframe-container { height: calc(100vh - 80px - 60px - 20px); }
     }
   </style>
 </head>
@@ -128,23 +156,46 @@
 
       <div class="loading" id="loading">
         <div class="spinner"></div>
-        <p style="margin-top:15px;color:#666;">กำลังโหลด...</p>
+        <p style="margin-top:15px;color:#666; pointer-events:none;">กำลังโหลด...</p>
       </div>
 
-      <!-- Iframes -->
-      <iframe id="iframe-checklist" class="iframe-container"></iframe>
-      <iframe id="iframe-tispayroll" class="iframe-container"></iframe>
-      <iframe id="iframe-tishome" class="iframe-container"></iframe>
-      <iframe id="iframe-tractor" class="iframe-container"></iframe>
-      <iframe id="iframe-emailslipTis" class="iframe-container"></iframe>
-      <iframe id="iframe-picrai" class="iframe-container"></iframe>
-      <iframe id="iframe-edoc" class="iframe-container"></iframe>
-      <iframe id="iframe-dash" class="iframe-container"></iframe>
+      <!-- Iframes with added allow + sandbox + tabindex -->
+      <iframe id="iframe-checklist" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-tispayroll" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-tishome" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-tractor" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-emailslipTis" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-picrai" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-edoc" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+
+      <iframe id="iframe-dash" class="iframe-container" tabindex="0"
+        allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
 
       <!-- Stats Screen -->
       <div id="statsScreen" class="iframe-container">
-        <h2>📊 สถิติการใช้งานระบบ</h2>
-        <div id="statsContent">
+        <h2 style="padding:20px 20px 0 20px;">📊 สถิติการใช้งานระบบ</h2>
+        <div id="statsContent" style="padding:20px;">
           <p>⏳ กำลังโหลดข้อมูล...</p>
         </div>
       </div>
@@ -208,20 +259,30 @@
     async function loadSystem(event, systemId, systemName) {
       document.getElementById('loading').classList.add('show');
       document.getElementById('welcomeScreen').style.display='none';
-      document.querySelectorAll('.iframe-container').forEach(f=>f.classList.remove('active'));
+      document.querySelectorAll('.iframe-container').forEach(f=>{
+        f.classList.remove('active');
+        // blur tabindex for hidden frames to avoid accidental focus
+        try{ f.blur(); }catch(e){}
+      });
       document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
       if(event) event.target.classList.add('active');
       document.getElementById('breadcrumb').innerHTML=`หน้าหลัก > ระบบจัดการ > <span class="current">${systemName}</span>`;
       document.getElementById('systemStatus').textContent=`สถานะ: กำลังโหลด ${systemName}`;
       const iframe=document.getElementById(`iframe-${systemId}`);
       if(!iframe.src) iframe.src=systemUrls[systemId]||'#';
+
+      // slight delay to show loading smoothly (you already had a timeout)
       setTimeout(()=>{
         document.getElementById('loading').classList.remove('show');
+
+        // show target iframe and ensure it receives focus
         iframe.classList.add('active');
+        try{ iframe.focus(); }catch(e){}
         document.getElementById('systemStatus').textContent=`สถานะ: ${systemName} พร้อมใช้งาน`;
         updateLastUpdate();
         logAccess("UserDemo", systemName);
-      },1000);
+      },800);
+
       currentSystem=systemId;
 
       if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
