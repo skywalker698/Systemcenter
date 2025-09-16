@@ -101,6 +101,45 @@
       /* On small screens increase iframe min-height a bit */
       .iframe-container { height: calc(100vh - 80px - 60px - 20px); }
     }
+/* ===== Modal Styles ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display:flex; justify-content:center; align-items:center;
+}
+.modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 320px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  animation: zoomIn 0.3s ease;
+}
+.modal-content h3 { margin-bottom:10px; color:#2c3e50; }
+.modal-content input {
+  width: 100%; padding: 10px; margin: 10px 0;
+  border: 1px solid #ccc; border-radius: 8px;
+  font-size: 1rem;
+}
+.modal-actions { display:flex; justify-content:space-between; gap:10px; }
+.modal-actions button {
+  flex:1; padding:10px;
+  border:none; border-radius:8px;
+  cursor:pointer; font-size:1rem;
+  transition:0.2s;
+}
+.modal-actions button:first-child { background:#3498db; color:#fff; }
+.modal-actions button:first-child:hover { background:#2980b9; }
+.modal-actions button:last-child { background:#ecf0f1; }
+.modal-actions button:last-child:hover { background:#bdc3c7; }
+
+@keyframes zoomIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
   </style>
 </head>
 <body>
@@ -141,7 +180,8 @@
         <div class="menu-title"><i class="fas fa-cog"></i> ตั้งค่าระบบ</div>
         <a class="menu-item" onclick="showSettings()"><i class="fas fa-sliders-h"></i> การตั้งค่า</a>
         <a class="menu-item" onclick="showHelp()"><i class="fas fa-question-circle"></i> ช่วยเหลือ</a>
-        <a class="menu-item" onclick="showStats()"><i class="fas fa-chart-line"></i> สถิติการใช้งาน</a>
+        <a class="menu-item" onclick="openPasswordModal()"><i class="fas fa-chart-line"></i> สถิติการใช้งาน</a>
+
       </div>
     </nav>
 
@@ -158,7 +198,19 @@
         <div class="spinner"></div>
         <p style="margin-top:15px;color:#666; pointer-events:none;">กำลังโหลด...</p>
       </div>
-
+<!-- 🔒 Password Modal -->
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <h3>🔐 เข้าถึงสถิติการใช้งาน</h3>
+    <p>กรุณากรอกรหัสผ่าน</p>
+    <input type="password" id="statsPassword" placeholder="Password" />
+    <div class="modal-actions">
+      <button onclick="checkPassword()">ตกลง</button>
+      <button onclick="closePasswordModal()">ยกเลิก</button>
+    </div>
+    <p id="passwordError" style="color:red;display:none;margin-top:10px;">❌ รหัสผ่านไม่ถูกต้อง</p>
+  </div>
+</div>
       <!-- Iframes with added allow + sandbox + tabindex -->
       <iframe id="iframe-checklist" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
@@ -295,7 +347,26 @@
       try{ await fetch(`${statsApi}?user=${encodeURIComponent(user)}&page=${encodeURIComponent(page)}`); }
       catch(err){ console.error("Log Error:",err); }
     }
+function openPasswordModal(){
+  document.getElementById("passwordModal").style.display="flex";
+  document.getElementById("statsPassword").value="";
+  document.getElementById("passwordError").style.display="none";
+  document.getElementById("statsPassword").focus();
+}
 
+function closePasswordModal(){
+  document.getElementById("passwordModal").style.display="none";
+}
+
+function checkPassword(){
+  const pass = document.getElementById("statsPassword").value.trim();
+  if(pass === "112233"){
+    closePasswordModal();
+    showStats(); // ✅ เรียกฟังก์ชันเดิม
+  }else{
+    document.getElementById("passwordError").style.display="block";
+  }
+}
     async function showStats(){
       document.getElementById('welcomeScreen').style.display='none';
       document.querySelectorAll('.iframe-container').forEach(f=>f.classList.remove('active'));
