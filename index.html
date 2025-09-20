@@ -3,151 +3,456 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ศูนย์รวมระบบจัดการ</title>
+  <title>ศูนย์รวมระบบจัดการ Tis-Company</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     /* ======= Reset & Body ======= */
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Sarabun','Prompt',Arial,sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; display:flex; flex-direction:column; }
+    body { 
+      font-family:'Sarabun','Prompt',Arial,sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      min-height:100vh; 
+      display:flex; 
+      flex-direction:column;
+      overflow-x: hidden;
+    }
 
     /* ======= Header ======= */
-    .header { background:#2c3e50; color:white; padding:15px 0; box-shadow:0 2px 10px rgba(0,0,0,0.1); position:fixed; width:100%; top:0; z-index:1000; }
-    .header-content { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; justify-content:space-between; align-items:center; }
-    .logo { display:flex; align-items:center; gap:15px; }
-    .logo i { font-size:2rem; color:#3498db; }
+    .header { 
+      background:#2c3e50; 
+      color:white; 
+      padding:15px 0; 
+      box-shadow:0 2px 10px rgba(0,0,0,0.1); 
+      position:fixed; 
+      width:100%; 
+      top:0; 
+      z-index:1000;
+      backdrop-filter: blur(10px);
+    }
+    .header-content { 
+      max-width:1200px; 
+      margin:0 auto; 
+      padding:0 20px; 
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+    }
+    .logo { 
+      display:flex; 
+      align-items:center; 
+      gap:15px; 
+      transition: transform 0.3s ease;
+    }
+    .logo:hover { transform: scale(1.02); }
+    .logo i { 
+      font-size:2rem; 
+      color:#3498db; 
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
     .logo h1 { font-size:1.5rem; font-weight:600; }
-    .user-info { display:flex; align-items:center; gap:10px; font-size:.9rem; }
-    #hamburgerBtn { display:none; font-size:1.5rem; cursor:pointer; }
+    .user-info { 
+      display:flex; 
+      align-items:center; 
+      gap:10px; 
+      font-size:.9rem; 
+    }
+    #hamburgerBtn { 
+      display:none; 
+      font-size:1.5rem; 
+      cursor:pointer; 
+      transition: transform 0.2s ease;
+    }
+    #hamburgerBtn:hover { transform: rotate(90deg); }
 
     /* ======= Layout ======= */
-    .main-container { display:flex; margin-top:80px; flex:1; min-height:calc(100vh - 80px - 60px); }
-    .sidebar { width:280px; background:white; box-shadow:2px 0 10px rgba(0,0,0,0.1); padding:20px 0; overflow-y:auto; }
+    .main-container { 
+      display:flex; 
+      margin-top:80px; 
+      flex:1; 
+      min-height:calc(100vh - 80px - 60px); 
+    }
+    .sidebar { 
+      width:280px; 
+      background:white; 
+      box-shadow:2px 0 10px rgba(0,0,0,0.1); 
+      padding:20px 0; 
+      overflow-y:auto; 
+      transition: all 0.3s ease;
+    }
     .menu-section { margin-bottom:30px; }
-    .menu-title { background:#34495e; color:white; padding:12px 20px; font-weight:600; font-size:.95rem; text-transform:uppercase; letter-spacing:1px; }
-    .menu-item { display:block; padding:15px 20px; color:#2c3e50; text-decoration:none; border-left:4px solid transparent; transition:all .3s ease; cursor:pointer; background:white; }
-    .menu-item:hover { background:#ecf0f1; border-left-color:#3498db; transform:translateX(5px); }
-    .menu-item.active { background:#e8f4fd; border-left-color:#2980b9; color:#2980b9; font-weight:600; }
-    .menu-item i { width:20px; margin-right:12px; text-align:center; }
-    .content { flex:1; background:white; margin:20px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1); overflow:hidden; position:relative; display:flex; flex-direction:column; }
+    .menu-title { 
+      background:#34495e; 
+      color:white; 
+      padding:12px 20px; 
+      font-weight:600; 
+      font-size:.95rem; 
+      text-transform:uppercase; 
+      letter-spacing:1px; 
+    }
+    .menu-item { 
+      display:block; 
+      padding:15px 20px; 
+      color:#2c3e50; 
+      text-decoration:none; 
+      border-left:4px solid transparent; 
+      transition:all .3s ease; 
+      cursor:pointer; 
+      background:white;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #3498db, #2980b9);
+      transition: width 0.3s ease;
+      z-index: 0;
+    }
+    .menu-item:hover::before { width: 4px; }
+    .menu-item:hover { 
+      background:#ecf0f1; 
+      transform:translateX(5px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .menu-item.active { 
+      background:#e8f4fd; 
+      border-left-color:#2980b9; 
+      color:#2980b9; 
+      font-weight:600; 
+    }
+    .menu-item.active::before { width: 4px; }
+    .menu-item i { 
+      width:20px; 
+      margin-right:12px; 
+      text-align:center; 
+      position: relative;
+      z-index: 1;
+    }
+    .menu-item span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .content { 
+      flex:1; 
+      background:white; 
+      margin:20px; 
+      border-radius:10px; 
+      box-shadow:0 5px 20px rgba(0,0,0,0.1); 
+      overflow:hidden; 
+      position:relative; 
+      display:flex; 
+      flex-direction:column;
+      transition: all 0.3s ease;
+    }
 
-    .breadcrumb { background:#f8f9fa; padding:15px 20px; border-bottom:1px solid #dee2e6; font-size:.9rem; color:#6c757d; }
+    .breadcrumb { 
+      background:#f8f9fa; 
+      padding:15px 20px; 
+      border-bottom:1px solid #dee2e6; 
+      font-size:.9rem; 
+      color:#6c757d; 
+      transition: background-color 0.3s ease;
+    }
     .breadcrumb .current { color:#2c3e50; font-weight:600; }
 
     /* ======= Welcome ======= */
-    .welcome-screen { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px; }
-    .welcome-screen i { font-size:5rem; color:#3498db; margin-bottom:20px; }
-    .welcome-screen h2 { color:#2c3e50; margin-bottom:15px; font-size:1.8rem; }
-    .welcome-screen p { color:#7f8c8d; font-size:1.1rem; line-height:1.6; max-width:500px; }
+    .welcome-screen { 
+      flex:1; 
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      justify-content:center; 
+      text-align:center; 
+      padding:40px;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    .welcome-screen.fade-out { opacity: 0; }
+    .welcome-screen i { 
+      font-size:5rem; 
+      color:#3498db; 
+      margin-bottom:20px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .welcome-screen h2 { 
+      color:#2c3e50; 
+      margin-bottom:15px; 
+      font-size:1.8rem;
+      animation: slideInUp 0.8s ease;
+    }
+    .welcome-screen p { 
+      color:#7f8c8d; 
+      font-size:1.1rem; 
+      line-height:1.6; 
+      max-width:500px;
+      animation: slideInUp 0.8s ease 0.2s both;
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     /* ======= Iframe ======= */
-    /* The iframe elements themselves have class "iframe-container" in your markup */
     .iframe-container {
       width:100%;
       flex:1;
       border:none;
       display:none;
-      padding:0; /* we let iframe content handle inner padding */
+      padding:0;
       overflow:auto;
-      /* ensure iframe can grow to fill available space and accept pointer events only when active */
-      height: calc(100vh - 80px - 60px - 40px); /* header 80 + footer ~60 + margins */
+      height: calc(100vh - 80px - 60px - 40px);
       min-height: 300px;
       position:relative;
       z-index:1;
-      pointer-events: none; /* default: disabled until active */
+      pointer-events: none;
       background:transparent;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
     .iframe-container.active {
       display:block;
-      pointer-events: auto; /* allow interaction only for active iframe */
+      pointer-events: auto;
       z-index:5;
+      opacity: 1;
     }
-    /* make sure focusable */
     .iframe-container[tabindex] { outline: none; }
 
     /* ======= Loading ======= */
-    .loading { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); display:none; text-align:center; z-index:200; }
-    .loading.show { display:block; }
-    .spinner { width:50px; height:50px; border:5px solid #f3f3f3; border-top:5px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; }
-    @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
-
-    /* IMPORTANT: don't let the loading overlay block pointer events */
+    .loading { 
+      position:absolute; 
+      top:50%; 
+      left:50%; 
+      transform:translate(-50%, -50%); 
+      display:none; 
+      text-align:center; 
+      z-index:200;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .loading.show { 
+      display:block; 
+      opacity: 1;
+    }
+    .spinner { 
+      width:50px; 
+      height:50px; 
+      border:5px solid #f3f3f3; 
+      border-top:5px solid #3498db; 
+      border-radius:50%; 
+      animation:spin 1s linear infinite; 
+    }
+    @keyframes spin { 
+      0%{transform:rotate(0deg)} 
+      100%{transform:rotate(360deg)} 
+    }
     .loading, .loading * { pointer-events: none; }
 
     /* ======= Status Bar ======= */
-    .status-bar { background:#34495e; color:white; padding:10px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; }
+    .status-bar { 
+      background:#34495e; 
+      color:white; 
+      padding:10px 20px; 
+      font-size:.9rem; 
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center;
+      transition: background-color 0.3s ease;
+    }
+    .status-bar.loading { background:#e67e22; }
+    .status-bar.success { background:#27ae60; }
+    .status-bar.error { background:#e74c3c; }
 
     /* ======= Footer ======= */
-    footer { background:#2c3e50; color:#ecf0f1; padding:15px 20px; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    footer { 
+      background:#2c3e50; 
+      color:#ecf0f1; 
+      padding:15px 20px; 
+      font-size:.9rem; 
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+      flex-wrap:wrap;
+      backdrop-filter: blur(10px);
+    }
     footer .left { font-weight:500; }
-    footer .right { display:flex; align-items:center; gap:8px; font-size:.9rem; color:#bdc3c7; }
+    footer .right { 
+      display:flex; 
+      align-items:center; 
+      gap:8px; 
+      font-size:.9rem; 
+      color:#bdc3c7; 
+    }
     footer .right i { color:#3498db; }
 
     /* ======= Table Styles ======= */
-    #statsContent table { width:100%; border-collapse:collapse; margin-top:15px; font-size:.95rem; }
-    #statsContent th, #statsContent td { padding:10px; text-align:left; border:1px solid #ddd; }
-    #statsContent th { background:#3498db; color:white; }
+    #statsContent table { 
+      width:100%; 
+      border-collapse:collapse; 
+      margin-top:15px; 
+      font-size:.95rem;
+      animation: fadeInUp 0.5s ease;
+    }
+    #statsContent th, #statsContent td { 
+      padding:12px; 
+      text-align:left; 
+      border:1px solid #ddd; 
+    }
+    #statsContent th { 
+      background:#3498db; 
+      color:white;
+      position: sticky;
+      top: 0;
+    }
     #statsContent tr:nth-child(even) { background:#f2f2f2; }
-    #statsContent tr:hover { background:#d0ebff; }
+    #statsContent tr:hover { 
+      background:#d0ebff;
+      transform: scale(1.01);
+      transition: all 0.2s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ======= Modal Styles ======= */
+    .modal {
+      position: fixed;
+      z-index: 2000;
+      left: 0; 
+      top: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center; 
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+      display: flex;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      width: 320px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+    .modal-content h3 { 
+      margin-bottom:10px; 
+      color:#2c3e50; 
+    }
+    .modal-content input {
+      width: 100%; 
+      padding: 12px; 
+      margin: 10px 0;
+      border: 1px solid #ccc; 
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+    }
+    .modal-content input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    .modal-actions { 
+      display:flex; 
+      justify-content:space-between; 
+      gap:10px; 
+    }
+    .modal-actions button {
+      flex:1; 
+      padding:12px;
+      border:none; 
+      border-radius:8px;
+      cursor:pointer; 
+      font-size:1rem;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .modal-actions button:first-child { 
+      background:#3498db; 
+      color:#fff; 
+    }
+    .modal-actions button:first-child:hover { 
+      background:#2980b9;
+      transform: translateY(-1px);
+    }
+    .modal-actions button:last-child { 
+      background:#ecf0f1; 
+    }
+    .modal-actions button:last-child:hover { 
+      background:#bdc3c7;
+      transform: translateY(-1px);
+    }
 
     /* ======= Responsive ======= */
     @media (max-width:768px) {
       #hamburgerBtn { display:block; color:white; }
-      .sidebar { width:80%; max-width:280px; position:fixed; top:80px; left:-100%; transition:left .3s ease; z-index:999; height:calc(100vh - 80px); }
+      .sidebar { 
+        width:80%; 
+        max-width:280px; 
+        position:fixed; 
+        top:80px; 
+        left:-100%; 
+        transition:left .3s ease; 
+        z-index:999; 
+        height:calc(100vh - 80px);
+      }
       .sidebar.active { left:0; }
       .main-container { flex-direction:column; }
       .content { margin:10px; }
-      footer { flex-direction:column; text-align:center; gap:5px; }
-
-      /* On small screens increase iframe min-height a bit */
-      .iframe-container { height: calc(100vh - 80px - 60px - 20px); }
+      footer { 
+        flex-direction:column; 
+        text-align:center; 
+        gap:5px; 
+      }
+      .iframe-container { 
+        height: calc(100vh - 80px - 60px - 20px); 
+      }
+      .modal-content { width: 280px; }
     }
-/* ===== Modal Styles ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display:flex; justify-content:center; align-items:center;
-}
-.modal-content {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  width: 320px;
-  max-width: 90%;
-  text-align: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-  animation: zoomIn 0.3s ease;
-}
-.modal-content h3 { margin-bottom:10px; color:#2c3e50; }
-.modal-content input {
-  width: 100%; padding: 10px; margin: 10px 0;
-  border: 1px solid #ccc; border-radius: 8px;
-  font-size: 1rem;
-}
-.modal-actions { display:flex; justify-content:space-between; gap:10px; }
-.modal-actions button {
-  flex:1; padding:10px;
-  border:none; border-radius:8px;
-  cursor:pointer; font-size:1rem;
-  transition:0.2s;
-}
-.modal-actions button:first-child { background:#3498db; color:#fff; }
-.modal-actions button:first-child:hover { background:#2980b9; }
-.modal-actions button:last-child { background:#ecf0f1; }
-.modal-actions button:last-child:hover { background:#bdc3c7; }
 
-@keyframes zoomIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+    /* ======= Additional Performance Styles ======= */
+    .will-change { will-change: transform, opacity; }
+    .gpu-accelerated { transform: translateZ(0); }
   </style>
 </head>
 <body>
   <header class="header">
     <div class="header-content">
-      <div class="logo"><i class="fas fa-cogs"></i><h1>ศูนย์รวมระบบจัดการ</h1></div>
+      <div class="logo">
+        <i class="fas fa-cogs"></i>
+        <h1>ศูนย์รวมระบบจัดการ</h1>
+      </div>
       <div class="user-info">
-        <i class="fas fa-user-circle"></i><span id="currentUser">ผู้ใช้งาน</span> | <span id="currentTime"></span>
+        <i class="fas fa-user-circle"></i>
+        <span id="currentUser">ผู้ใช้งาน</span> | 
+        <span id="currentTime"></span>
         <span id="hamburgerBtn">&#9776;</span>
       </div>
     </div>
@@ -157,36 +462,73 @@
     <nav class="sidebar" id="sidebar">
       <div class="menu-section">
         <div class="menu-title"><i class="fas fa-home"></i> หน้าหลัก</div>
-        <a class="menu-item" onclick="loadSystem(event,'picrai','ระบบ ติดตามอ้อยเข้าหีบ')"><i class="fa-solid fa-chart-line"></i> ระบบ:สรุปอ้อยประจำวัน</a>
-        <a class="menu-item" onclick="loadSystem(event,'dash','ระบบ ติดตามอ้อยเข้าหีบ')"><i class="fa-solid fa-chart-area"></i> ระบบ:ติดตามอ้อยเข้าหีบ</a>
+        <a class="menu-item" onclick="loadSystem(event,'picrai','ระบบ ติดตามอ้อยเข้าหีบ')">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>ระบบ:สรุปอ้อยประจำวัน</span>
+        </a>
+        <a class="menu-item" onclick="loadSystem(event,'dash','ระบบ ติดตามอ้อยเข้าหีบ')">
+          <i class="fa-solid fa-chart-area"></i>
+          <span>ระบบ:ติดตามอ้อยเข้าหีบ</span>
+        </a>
       </div>
 
       <div class="menu-section">
         <div class="menu-title"><i class="fas fa-database"></i> ระบบจัดการข้อมูล</div>
-        <a class="menu-item" onclick="loadSystem(event,'tractor','ระบบ Approve-Online')"><i class="fa-solid fa-signature"></i> ระบบ:เซ็นต์เอกสารออนไลน์</a>
-        <a class="menu-item" onclick="loadSystem(event,'checklist','ระบบ Checklist')"><i class="fa-solid fa-gears"></i> ระบบ:ตรวจเช็คType-A</a>
-        <a class="menu-item" onclick="loadSystem(event,'picrai','ระบบ Dash-Tisdaily')"><i class="fas fa-camera"></i> ระบบ DashBoard-หีบอ้อย2568(Test)</a>
-        <a class="menu-item" onclick="loadSystem(event,'edoc','ระบบ BookAL')"><i class="fas fa-home"></i> ระบบ:บันทึก อล.TisSugar</a>
+        <a class="menu-item" onclick="loadSystem(event,'tractor','ระบบ Approve-Online')">
+          <i class="fa-solid fa-signature"></i>
+          <span>ระบบ:เซ็นต์เอกสารออนไลน์</span>
+        </a>
+        <a class="menu-item" onclick="loadSystem(event,'checklist','ระบบ Checklist')">
+          <i class="fa-solid fa-gears"></i>
+          <span>ระบบ:ตรวจเช็คType-A</span>
+        </a>
+        <a class="menu-item" onclick="loadSystem(event,'picrai','ระบบ Dash-Tisdaily')">
+          <i class="fas fa-camera"></i>
+          <span>ระบบ DashBoard-หีบอ้อย2568(Test)</span>
+        </a>
+        <a class="menu-item" onclick="loadSystem(event,'edoc','ระบบ BookAL')">
+          <i class="fas fa-home"></i>
+          <span>ระบบ:บันทึก อล.TisSugar</span>
+        </a>
       </div>
 
       <div class="menu-section">
         <div class="menu-title"><i class="fas fa-tools"></i> เครื่องมือ</div>
-        <a class="menu-item" onclick="loadSystem(event,'tispayroll','ระบบ ขอสลิปย้อนหลัง')"><i class="fas fa-money-bill-wave"></i> ระบบ:ขอสลิปย้อนหลัง</a>
-        <a class="menu-item" onclick="loadSystem(event,'tishome','ระบบDoc-to-QR')"><i class="fas fa-home"></i> ระบบ:แจกเอกสาร-Qrcode</a>
-        <a class="menu-item" onclick="loadSystem(event,'emailslipTis','ระบบ Email-Info')"><i class="fas fa-envelope"></i> ระบบ ขอยื่นแก้ Email รับ Slip</a>
+        <a class="menu-item" onclick="loadSystem(event,'tispayroll','ระบบ ขอสลิปย้อนหลัง')">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>ระบบ:ขอสลิปย้อนหลัง</span>
+        </a>
+        <a class="menu-item" onclick="loadSystem(event,'tishome','ระบบDoc-to-QR')">
+          <i class="fas fa-home"></i>
+          <span>ระบบ:แจกเอกสาร-Qrcode</span>
+        </a>
+        <a class="menu-item" onclick="loadSystem(event,'emailslipTis','ระบบ Email-Info')">
+          <i class="fas fa-envelope"></i>
+          <span>ระบบ ขอยื่นแก้ Email รับ Slip</span>
+        </a>
       </div>
 
       <div class="menu-section">
         <div class="menu-title"><i class="fas fa-cog"></i> ตั้งค่าระบบ</div>
-        <a class="menu-item" onclick="showSettings()"><i class="fas fa-sliders-h"></i> การตั้งค่า</a>
-        <a class="menu-item" onclick="showHelp()"><i class="fas fa-question-circle"></i> ช่วยเหลือ</a>
-        <a class="menu-item" onclick="openPasswordModal()"><i class="fas fa-chart-line"></i> สถิติการใช้งาน</a>
-
+        <a class="menu-item" onclick="showSettings()">
+          <i class="fas fa-sliders-h"></i>
+          <span>การตั้งค่า</span>
+        </a>
+        <a class="menu-item" onclick="showHelp()">
+          <i class="fas fa-question-circle"></i>
+          <span>ช่วยเหลือ</span>
+        </a>
+        <a class="menu-item" onclick="openPasswordModal()">
+          <i class="fas fa-chart-line"></i>
+          <span>สถิติการใช้งาน</span>
+        </a>
       </div>
     </nav>
 
     <main class="content">
-      <div class="breadcrumb" id="breadcrumb">หน้าหลัก <span class="current">DashBoard</span></div>
+      <div class="breadcrumb" id="breadcrumb">
+        หน้าหลัก <span class="current">DashBoard</span>
+      </div>
 
       <div class="welcome-screen" id="welcomeScreen">
         <i class="fas fa-desktop"></i>
@@ -198,51 +540,61 @@
         <div class="spinner"></div>
         <p style="margin-top:15px;color:#666; pointer-events:none;">กำลังโหลด...</p>
       </div>
-<!-- 🔒 Password Modal -->
-<div id="passwordModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h3>🔐 เข้าถึงสถิติการใช้งาน</h3>
-    <p>กรุณากรอกรหัสผ่าน</p>
-    <input type="password" id="statsPassword" placeholder="Password" />
-    <div class="modal-actions">
-      <button onclick="checkPassword()">ตกลง</button>
-      <button onclick="closePasswordModal()">ยกเลิก</button>
-    </div>
-    <p id="passwordError" style="color:red;display:none;margin-top:10px;">❌ รหัสผ่านไม่ถูกต้อง</p>
-  </div>
-</div>
-      <!-- Iframes with added allow + sandbox + tabindex -->
+
+      <!-- Password Modal -->
+      <div id="passwordModal" class="modal">
+        <div class="modal-content">
+          <h3>🔐 เข้าถึงสถิติการใช้งาน</h3>
+          <p>กรุณากรอกรหัสผ่าน</p>
+          <input type="password" id="statsPassword" placeholder="Password" />
+          <div class="modal-actions">
+            <button onclick="checkPassword()">ตกลง</button>
+            <button onclick="closePasswordModal()">ยกเลิก</button>
+          </div>
+          <p id="passwordError" style="color:red;display:none;margin-top:10px;">❌ รหัสผ่านไม่ถูกต้อง</p>
+        </div>
+      </div>
+
+      <!-- Iframes -->
       <iframe id="iframe-checklist" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-tispayroll" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-tishome" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-tractor" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-emailslipTis" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-picrai" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-edoc" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <iframe id="iframe-dash" class="iframe-container" tabindex="0"
         allow="clipboard-read; clipboard-write; fullscreen; geolocation; microphone; camera"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+        loading="lazy"></iframe>
 
       <!-- Stats Screen -->
       <div id="statsScreen" class="iframe-container">
@@ -252,7 +604,7 @@
         </div>
       </div>
 
-      <div class="status-bar">
+      <div class="status-bar" id="statusBar">
         <span id="systemStatus">สถานะ: พร้อมใช้งาน</span>
         <span id="lastUpdate">อัพเดทล่าสุด: <span id="updateTime"></span></span>
       </div>
@@ -261,158 +613,139 @@
 
   <footer>
     <div class="left">© 2025 บริษัท น้ำตาลไทยเอกลักษณ์ จำกัด | ศูนย์รวมระบบจัดการ</div>
-    <div class="right"><i class="fas fa-user-cog"></i> ผู้พัฒนา: Sw.Wittawat.K</div>
+    <div class="right">
+      <i class="fas fa-user-cog"></i> 
+      ผู้พัฒนา: Sw.Wittawat.K
+    </div>
   </footer>
 
   <script>
-    const statsApi = "https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec";
-
-    const systemUrls = {
-      'checklist': 'https://skywalker698.github.io/checklist/',
-      'tispayroll': 'https://skywalker698.github.io/Tispayroll/',
-      'tishome': 'https://skywalker698.github.io/tishome/',
-      'tractor': 'https://skywalker698.github.io/tractor/',
-      'emailslipTis': 'https://skywalker698.github.io/emailslipTis/',
-      'picrai': 'https://skywalker698.github.io/PicRai/',
-      'edoc': 'https://skywalker698.github.io/E-doc/',
-      'dash': 'https://skywalker698.github.io/DachTissugar/'
+    // Configuration
+    const CONFIG = {
+      statsApi: "https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec",
+      loadingDelay: 800,
+      password: "112233",
+      systemUrls: {
+        'checklist': 'https://skywalker698.github.io/checklist/',
+        'tispayroll': 'https://skywalker698.github.io/Tispayroll/',
+        'tishome': 'https://skywalker698.github.io/tishome/',
+        'tractor': 'https://skywalker698.github.io/tractor/',
+        'emailslipTis': 'https://skywalker698.github.io/emailslipTis/',
+        'picrai': 'https://skywalker698.github.io/PicRai/',
+        'edoc': 'https://skywalker698.github.io/E-doc/',
+        'dash': 'https://skywalker698.github.io/DachTissugar/'
+      }
     };
 
-    let currentSystem = null;
+    // State management
+    let state = {
+      currentSystem: null,
+      timeInterval: null,
+      isLoading: false
+    };
 
+    // DOM elements cache
+    const elements = {};
+
+    // Initialize application
     document.addEventListener('DOMContentLoaded', function () {
-      updateTime();
-      setInterval(updateTime, 1000);
+      cacheElements();
+      setupEventListeners();
+      initializeTime();
       updateLastUpdate();
-      loadSystem(null, 'dash', 'ระบบ DashBoard : ติดตามอ้อยเข้าหีบ');
+      
+      // Load default system with delay for smooth startup
+      setTimeout(() => {
+        loadSystem(null, 'dash', 'ระบบ DashBoard : ติดตามอ้อยเข้าหีบ');
+      }, 300);
     });
 
+    // Cache DOM elements for better performance
+    function cacheElements() {
+      elements.currentTime = document.getElementById('currentTime');
+      elements.updateTime = document.getElementById('updateTime');
+      elements.welcomeScreen = document.getElementById('welcomeScreen');
+      elements.loading = document.getElementById('loading');
+      elements.breadcrumb = document.getElementById('breadcrumb');
+      elements.systemStatus = document.getElementById('systemStatus');
+      elements.sidebar = document.getElementById('sidebar');
+      elements.passwordModal = document.getElementById('passwordModal');
+      elements.statsPassword = document.getElementById('statsPassword');
+      elements.passwordError = document.getElementById('passwordError');
+      elements.statsScreen = document.getElementById('statsScreen');
+      elements.statsContent = document.getElementById('statsContent');
+      elements.statusBar = document.getElementById('statusBar');
+      elements.hamburgerBtn = document.getElementById('hamburgerBtn');
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Hamburger menu toggle
+      elements.hamburgerBtn.addEventListener('click', toggleSidebar);
+      
+      // Password modal Enter key support
+      elements.statsPassword.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          checkPassword();
+        }
+      });
+
+      // Modal close on outside click
+      elements.passwordModal.addEventListener('click', function(e) {
+        if (e.target === elements.passwordModal) {
+          closePasswordModal();
+        }
+      });
+
+      // Iframe error handling
+      document.querySelectorAll('.iframe-container[id^="iframe-"]').forEach(iframe => {
+        iframe.addEventListener('error', handleIframeError);
+        iframe.addEventListener('load', handleIframeLoad);
+      });
+
+      // Cleanup on page unload
+      window.addEventListener('beforeunload', cleanup);
+    }
+
+    // Initialize time display
+    function initializeTime() {
+      updateTime();
+      state.timeInterval = setInterval(updateTime, 1000);
+    }
+
+    // Update current time display
     function updateTime() {
       const now = new Date();
-      document.getElementById('currentTime').textContent = now.toLocaleString('th-TH',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      elements.currentTime.textContent = now.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
 
+    // Update last update time
     function updateLastUpdate() {
       const now = new Date();
-      document.getElementById('updateTime').textContent = now.toLocaleString('th-TH',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-    }
-
-    function showWelcome(event) {
-      document.querySelectorAll('.iframe-container').forEach(f=>f.classList.remove('active'));
-      document.getElementById('welcomeScreen').style.display='flex';
-      document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
-      if(event) event.target.classList.add('active');
-      document.getElementById('breadcrumb').innerHTML='หน้าหลัก > <span class="current">DashBoard</span>';
-      document.getElementById('systemStatus').textContent='สถานะ: พร้อมใช้งาน';
-      currentSystem=null;
-      if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
-    }
-
-    async function loadSystem(event, systemId, systemName) {
-      document.getElementById('loading').classList.add('show');
-      document.getElementById('welcomeScreen').style.display='none';
-      document.querySelectorAll('.iframe-container').forEach(f=>{
-        f.classList.remove('active');
-        // blur tabindex for hidden frames to avoid accidental focus
-        try{ f.blur(); }catch(e){}
+      elements.updateTime.textContent = now.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
       });
-      document.querySelectorAll('.menu-item').forEach(i=>i.classList.remove('active'));
-      if(event) event.target.classList.add('active');
-      document.getElementById('breadcrumb').innerHTML=`หน้าหลัก > ระบบจัดการ > <span class="current">${systemName}</span>`;
-      document.getElementById('systemStatus').textContent=`สถานะ: กำลังโหลด ${systemName}`;
-      const iframe=document.getElementById(`iframe-${systemId}`);
-      if(!iframe.src) iframe.src=systemUrls[systemId]||'#';
-
-      // slight delay to show loading smoothly (you already had a timeout)
-      setTimeout(()=>{
-        document.getElementById('loading').classList.remove('show');
-
-        // show target iframe and ensure it receives focus
-        iframe.classList.add('active');
-        try{ iframe.focus(); }catch(e){}
-        document.getElementById('systemStatus').textContent=`สถานะ: ${systemName} พร้อมใช้งาน`;
-        updateLastUpdate();
-        logAccess("UserDemo", systemName);
-      },800);
-
-      currentSystem=systemId;
-
-      if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
     }
 
-    function showSettings(){ alert('ฟังก์ชันการตั้งค่าจะเพิ่มในเวอร์ชันถัดไป'); }
-    function showHelp(){ alert('หากต้องการความช่วยเหลือ กรุณาติดต่อผู้ดูแลระบบ'); }
-
-    async function logAccess(user,page){
-      try{ await fetch(`${statsApi}?user=${encodeURIComponent(user)}&page=${encodeURIComponent(page)}`); }
-      catch(err){ console.error("Log Error:",err); }
-    }
-function openPasswordModal(){
-  document.getElementById("passwordModal").style.display="flex";
-  document.getElementById("statsPassword").value="";
-  document.getElementById("passwordError").style.display="none";
-  document.getElementById("statsPassword").focus();
-}
-
-function closePasswordModal(){
-  document.getElementById("passwordModal").style.display="none";
-}
-
-function checkPassword(){
-  const pass = document.getElementById("statsPassword").value.trim();
-  if(pass === "112233"){
-    closePasswordModal();
-    showStats(); // ✅ เรียกฟังก์ชันเดิม
-  }else{
-    document.getElementById("passwordError").style.display="block";
-  }
-}
-    async function showStats(){
-      document.getElementById('welcomeScreen').style.display='none';
-      document.querySelectorAll('.iframe-container').forEach(f=>f.classList.remove('active'));
-      const statsScreen=document.getElementById('statsScreen');
-      statsScreen.classList.add('active');
-      document.getElementById('breadcrumb').innerHTML='หน้าหลัก > <span class="current">สถิติการใช้งาน</span>';
-      document.getElementById('systemStatus').textContent='สถานะ: โหลดสถิติ...';
-      const statsContent=document.getElementById('statsContent');
-      statsContent.innerHTML='<p>⏳ กำลังโหลดข้อมูล...</p>';
-
-      try{
-        const res = await fetch(statsApi + '?action=stats');
-        const data = await res.json();
-
-        let tableHtml = `<table>
-          <thead><tr><th>วันที่/เวลา</th><th>ผู้ใช้</th><th>ระบบ</th></tr></thead>
-          <tbody>`;
-
-        data.logs.forEach(log=>{
-          tableHtml += `<tr><td>${log.date}</td><td>${log.user}</td><td>${log.page}</td></tr>`;
-        });
-
-        tableHtml += `</tbody></table>`;
-
-        statsContent.innerHTML = `
-          <p><b>👥 ผู้ใช้งานทั้งหมด:</b> ${data.totalUsers} ครั้ง</p>
-          <p><b>📅 วันนี้:</b> ${data.todayUsers} ครั้ง</p>
-          ${tableHtml}
-        `;
-
-        document.getElementById('systemStatus').textContent='สถานะ: แสดงสถิติแล้ว';
-      }catch(err){
-        console.error("Stats Error:",err);
-        statsContent.innerHTML='<p style="color:red;">❌ ไม่สามารถโหลดข้อมูลได้</p>';
-        document.getElementById('systemStatus').textContent='สถานะ: โหลดสถิติล้มเหลว';
-      }
-
-      updateLastUpdate();
-
-      if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('active'); }
+    // Toggle sidebar for mobile
+    function toggleSidebar() {
+      elements.sidebar.classList.toggle('active');
     }
 
-    // Hamburger toggle
-    document.getElementById('hamburgerBtn').addEventListener('click', ()=>{
-      document.getElementById('sidebar').classList.toggle('active');
-    });
-  </script>
-</body>
-</html>
+    // Show welcome screen
+    function showWelcome(event) {
+      hideAllFrames();
+      elements.welcomeScreen.style.display = 'flex';
+      updateActiveMenuItem(event?.target);
+      elements.breadcrumb.innerHTML = 'หน้าหลั
