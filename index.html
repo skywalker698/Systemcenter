@@ -3,1293 +3,984 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบ Portal - TIS Systems</title>
+    <title>TIS Portal — ระบบสารสนเทศ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --navy: #0d1b2a;
+            --navy-mid: #1b2d42;
+            --navy-light: #243447;
+            --gold: #c9a84c;
+            --gold-light: #e2c27d;
+            --gold-dim: #7a5e28;
+            --cream: #f5f0e8;
+            --white: #ffffff;
+            --muted: #8a9bb0;
+            --border: rgba(201,168,76,0.18);
+            --sidebar-w: 290px;
+            --header-h: 64px;
+            --radius: 8px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.18);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            background: var(--navy);
+            color: var(--white);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Login Screen Styles */
-        .login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        /* ─── LOGIN ─────────────────────────────────── */
+        #loginScreen {
+            position: fixed; inset: 0; z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--navy);
+            background-image:
+                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(201,168,76,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 60% at 80% 20%, rgba(13,27,42,0.6) 0%, transparent 70%);
         }
 
-        .login-container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
+        .login-card {
+            background: var(--navy-mid);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem 2.5rem 2.5rem;
+            width: 100%; max-width: 400px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-logo {
-            width: 80px;
-            height: 80px;
-            background: #2c3e50;
-            color: white;
+        .login-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .login-emblem {
+            width: 72px; height: 72px;
+            border: 2px solid var(--gold);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
             margin: 0 auto 1.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.1rem; font-weight: 500;
+            color: var(--gold);
+            letter-spacing: 1px;
         }
 
-        .login-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-subtitle {
-            color: #6c757d;
-            margin-bottom: 2rem;
-            font-size: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .form-input.error {
-            border-color: #e74c3c;
-        }
-
-        .login-button {
-            width: 100%;
-            padding: 0.875rem;
-            background: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-button:hover {
-            background: #34495e;
-        }
-
-        .login-button:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-        }
-
-        .error-message {
-            color: #e74c3c;
-            font-size: 0.875rem;
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: #fdf2f2;
-            border-radius: 6px;
-            display: none;
-        }
-
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #ffffff40;
-            border-top: 2px solid #ffffff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 0.5rem;
-        }
-
-        /* Portal Styles */
-        .portal-screen {
-            display: none;
-        }
-
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 1rem;
-            border-bottom: 3px solid #34495e;
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            background: white;
-            color: #2c3e50;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .header-text h1 {
-            font-size: 1.5rem;
+        .login-card h1 {
+            text-align: center;
+            font-size: 1.5rem; font-weight: 600;
+            color: var(--white);
             margin-bottom: 0.25rem;
         }
 
-        .header-text p {
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .login-card .sub {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin-bottom: 2rem;
+            letter-spacing: 0.5px;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .field { margin-bottom: 1.25rem; }
+
+        .field label {
+            display: block;
+            font-size: 0.78rem; font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 0.4rem;
         }
 
-        .user-name {
-            font-size: 0.9rem;
-            opacity: 0.9;
+        .field input {
+            width: 100%;
+            background: var(--navy);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: var(--radius);
+            color: var(--white);
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
         }
 
-        .logout-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+        .field input::placeholder { color: var(--muted); font-size: 0.85rem; }
+        .field input:focus { outline: none; border-color: var(--gold); }
+
+        .login-btn {
+            width: 100%; padding: 0.8rem;
+            background: var(--gold);
+            color: var(--navy);
+            border: none; border-radius: var(--radius);
+            font-family: inherit; font-size: 0.95rem; font-weight: 600;
             cursor: pointer;
-            font-size: 0.875rem;
-            transition: background 0.3s ease;
+            transition: background 0.2s, transform 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            margin-top: 0.5rem;
         }
 
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.2);
+        .login-btn:hover { background: var(--gold-light); }
+        .login-btn:active { transform: scale(0.99); }
+        .login-btn:disabled { background: var(--gold-dim); cursor: not-allowed; }
+
+        .err-box {
+            background: rgba(220,60,60,0.12);
+            border: 1px solid rgba(220,60,60,0.3);
+            border-radius: var(--radius);
+            color: #f08080;
+            font-size: 0.85rem; padding: 0.65rem 0.9rem;
+            margin-top: 0.75rem; display: none;
         }
 
-        .stats-info {
-            font-size: 0.85rem;
-            opacity: 0.7;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .spin-sm {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(13,27,42,0.3);
+            border-top-color: var(--navy);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
         }
 
-        .stat-item {
-            background: rgba(255,255,255,0.1);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+        /* ─── PORTAL ─────────────────────────────────── */
+        #portalScreen { display: none; flex-direction: column; height: 100vh; }
+
+        /* HEADER */
+        .hdr {
+            height: var(--header-h);
+            background: var(--navy-mid);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.25rem;
+            flex-shrink: 0;
+            position: sticky; top: 0; z-index: 100;
         }
 
-        .menu-toggle {
+        .hdr-left { display: flex; align-items: center; gap: 0.9rem; }
+
+        .hdr-badge {
+            width: 40px; height: 40px;
+            border: 1.5px solid var(--gold);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem; font-weight: 500; color: var(--gold);
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .hdr-title { font-size: 1.05rem; font-weight: 600; color: var(--white); line-height: 1.2; }
+        .hdr-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.5px; }
+
+        .hdr-right { display: flex; align-items: center; gap: 0.75rem; }
+
+        .stat-chip {
+            background: rgba(201,168,76,0.1);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.25rem 0.65rem;
+            font-size: 0.72rem; color: var(--gold-light);
+            display: flex; align-items: center; gap: 0.3rem;
+        }
+
+        .stat-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+
+        .user-chip {
+            font-size: 0.82rem; color: var(--muted);
+            max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            color: var(--muted);
+            padding: 0.4rem 0.8rem;
+            font-family: inherit; font-size: 0.8rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+
+        .btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+        .hamburger {
             display: none;
-            background: #34495e;
-            border: none;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
+            background: none; border: none;
+            color: var(--muted); font-size: 1.3rem;
+            cursor: pointer; padding: 0.3rem;
         }
 
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: calc(100vh - 80px);
-        }
+        /* BODY LAYOUT */
+        .portal-body { display: flex; flex: 1; overflow: hidden; height: calc(100vh - var(--header-h)); }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 280px;
-            background: white;
-            border-right: 1px solid #e0e6ed;
+            width: var(--sidebar-w);
+            background: var(--navy-mid);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
             transition: transform 0.3s ease;
         }
 
-        .sidebar-header {
-            background: #34495e;
-            color: white;
-            padding: 1rem;
-            font-weight: 600;
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 4px; }
+
+        .sidebar-lbl {
+            padding: 0.75rem 1rem 0.5rem;
+            font-size: 0.65rem; font-weight: 600;
+            color: var(--gold);
+            text-transform: uppercase; letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .menu-group {
-            border-bottom: 1px solid #e0e6ed;
-        }
+        /* Category groups */
+        .cat { border-bottom: 1px solid rgba(201,168,76,0.08); }
 
-        .menu-header {
-            background: #f8f9fa;
+        .cat-hdr {
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0.75rem 1rem;
-            font-weight: 600;
-            color: #2c3e50;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             transition: background 0.2s;
+            user-select: none;
         }
 
-        .menu-header:hover {
-            background: #e9ecef;
+        .cat-hdr:hover { background: rgba(201,168,76,0.05); }
+        .cat-hdr.open { background: rgba(201,168,76,0.07); }
+
+        .cat-left { display: flex; align-items: center; gap: 0.65rem; }
+
+        .cat-icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
         }
 
-        .menu-header.active {
-            background: #2c3e50;
-            color: white;
+        .cat-name { font-size: 0.82rem; font-weight: 500; color: var(--white); }
+        .cat-count { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+        .chevron-icon {
+            font-size: 0.6rem; color: var(--muted);
+            transition: transform 0.25s;
         }
 
-        .menu-icon {
-            margin-right: 0.5rem;
+        .cat-hdr.open .chevron-icon { transform: rotate(90deg); }
+
+        .cat-items { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .cat-items.open { max-height: 600px; }
+
+        .sys-item {
+            display: flex; align-items: flex-start; gap: 0.65rem;
+            padding: 0.6rem 1rem 0.6rem 1.5rem;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            transition: all 0.15s;
         }
 
-        .chevron {
-            transition: transform 0.3s;
-            font-size: 0.8rem;
+        .sys-item:hover {
+            background: rgba(201,168,76,0.06);
+            border-left-color: rgba(201,168,76,0.4);
         }
 
-        .menu-group.expanded .chevron {
-            transform: rotate(90deg);
+        .sys-item.active {
+            background: rgba(201,168,76,0.1);
+            border-left-color: var(--gold);
         }
 
-        .menu-items {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
+        .sys-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%; background: var(--muted);
+            margin-top: 0.45rem; flex-shrink: 0;
+            transition: background 0.15s;
         }
 
-        .menu-group.expanded .menu-items {
-            max-height: 300px;
+        .sys-item.active .sys-dot, .sys-item:hover .sys-dot { background: var(--gold); }
+
+        .sys-text { flex: 1; }
+        .sys-name { font-size: 0.8rem; color: #c8d4e0; line-height: 1.35; }
+        .sys-item.active .sys-name { color: var(--gold-light); font-weight: 500; }
+        .sys-tag {
+            display: inline-block;
+            font-size: 0.6rem; font-family: 'IBM Plex Mono', monospace;
+            background: rgba(201,168,76,0.12);
+            color: var(--gold-dim);
+            border-radius: 3px; padding: 0.05rem 0.3rem;
+            margin-top: 0.2rem; letter-spacing: 0.5px;
         }
 
-        .menu-item {
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
+        /* MAIN CONTENT */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        .main-hdr {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--navy-light);
+            flex-shrink: 0;
+        }
+
+        .main-title { font-size: 0.95rem; font-weight: 600; color: var(--white); }
+        .main-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+
+        .content-area { flex: 1; position: relative; overflow: hidden; }
+
+        /* Welcome */
+        .welcome {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 2rem;
+            background: var(--navy);
+        }
+
+        .welcome-ring {
+            width: 80px; height: 80px;
+            border: 1.5px solid var(--border);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin-bottom: 1.25rem;
+        }
+
+        .welcome h2 { font-size: 1.2rem; font-weight: 600; color: var(--white); margin-bottom: 0.5rem; }
+        .welcome p { color: var(--muted); font-size: 0.875rem; line-height: 1.6; max-width: 360px; }
+
+        /* Quick cards on welcome */
+        .quick-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem; margin-top: 2rem; width: 100%; max-width: 640px;
+        }
+
+        .quick-card {
+            background: var(--navy-mid);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
-            border-left: 3px solid transparent;
-            display: flex;
-            align-items: center;
+            text-align: left;
         }
 
-        .menu-item:hover {
-            background: #f8f9fa;
-            border-left-color: #3498db;
+        .quick-card:hover {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.06);
+            transform: translateY(-1px);
         }
 
-        .menu-item.active {
-            background: #ebf3fd;
-            border-left-color: #2c3e50;
-            color: #2c3e50;
-            font-weight: 500;
+        .qc-icon { font-size: 1.3rem; margin-bottom: 0.4rem; }
+        .qc-name { font-size: 0.75rem; font-weight: 500; color: #c8d4e0; line-height: 1.3; }
+
+        /* Loading */
+        .loader {
+            position: absolute; inset: 0;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: var(--navy); gap: 1rem;
         }
 
-        .item-icon {
-            width: 16px;
-            height: 16px;
-            background: #3498db;
-            color: white;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: white;
-        }
-
-        .content-header {
-            padding: 1rem;
-            border-bottom: 1px solid #e0e6ed;
-            background: #f8f9fa;
-        }
-
-        .content-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .content-subtitle {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .content-body {
-            flex: 1;
-            position: relative;
-            min-height: 500px;
-        }
-
-        .welcome-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            color: #6c757d;
-            padding: 2rem;
-        }
-
-        .welcome-icon {
-            width: 80px;
-            height: 80px;
-            background: #2c3e50;
-            color: white;
+        .spin-lg {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(201,168,76,0.15);
+            border-top-color: var(--gold);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin-bottom: 1rem;
+            animation: spin 0.8s linear infinite;
         }
 
-        .welcome-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
+        .loader-text { font-size: 0.82rem; color: var(--muted); }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Iframe */
+        #sysIframe {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            border: none; display: none;
         }
 
-        .welcome-text {
-            font-size: 1rem;
-            max-width: 400px;
-            line-height: 1.5;
+        /* Overlay for mobile */
+        .overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 50;
         }
 
-        .system-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: none;
-        }
-
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            display: none;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e0e6ed;
-            border-top: 4px solid #2c3e50;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mobile Responsive */
+        /* ─── RESPONSIVE ──────────────────────────────── */
         @media (max-width: 768px) {
-            .login-container {
-                margin: 1rem;
-                padding: 2rem;
-            }
+            :root { --sidebar-w: 280px; }
 
-            .menu-toggle {
-                display: block;
-            }
-
-            .container {
-                position: relative;
-            }
+            .hdr-sub, .stat-chip { display: none; }
+            .hamburger { display: block; }
+            .user-chip { max-width: 90px; }
 
             .sidebar {
                 position: fixed;
-                top: 80px;
-                left: 0;
-                height: calc(100vh - 80px);
+                top: var(--header-h); left: 0;
+                height: calc(100vh - var(--header-h));
+                z-index: 60;
                 transform: translateX(-100%);
-                z-index: 1000;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             }
 
-            .sidebar.open {
-                transform: translateX(0);
-            }
+            .sidebar.open { transform: translateX(0); }
+            .overlay { display: none; }
+            .overlay.active { display: block; }
 
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 80px;
-                left: 0;
-                width: 100%;
-                height: calc(100vh - 80px);
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-            }
-
-            .overlay.active {
-                display: block;
-            }
-
-            .main-content {
-                width: 100%;
-            }
-
-            .stats-info {
-                display: none;
-            }
-
-            .user-info {
-                flex-direction: row;
-                gap: 0.5rem;
-            }
-
-            .header-text h1 {
-                font-size: 1.2rem;
-            }
-
-            .header-text p {
-                font-size: 0.8rem;
-            }
+            .quick-grid { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="login-screen" id="loginScreen">
-        <div class="login-container">
-            <div class="login-logo">TIS</div>
-            <h1 class="login-title">เข้าสู่ระบบ</h1>
-            <p class="login-subtitle">ระบบสารสนเทศ TIS</p>
-            
-            <div class="form-group">
-                <label class="form-label">รหัสผู้ใช้งาน</label>
-                <input type="text" class="form-input" id="userId" placeholder="เลขพนักงาน 4 ตัวท้าย" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">รหัสผ่าน</label>
-                <input type="password" class="form-input" id="password" placeholder=" เลข 3 ตัวท้ายบัตร ปชช." required>
-            </div>
-            
-            <button type="button" class="login-button" id="loginButton">
-                เข้าสู่ระบบ
-            </button>
-            
-            <div class="error-message" id="errorMessage"></div>
+
+<!-- ═══ LOGIN ═══════════════════════════════════ -->
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-emblem">TIS</div>
+        <h1>เข้าสู่ระบบ</h1>
+        <p class="sub">THAI IDENTITY SUGAR FACTORY — ระบบสารสนเทศภายใน</p>
+
+        <div class="field">
+            <label>รหัสพนักงาน</label>
+            <input type="text" id="userId" placeholder="เลขพนักงาน 4 ตัวท้าย" autocomplete="username">
         </div>
+        <div class="field">
+            <label>รหัสผ่าน</label>
+            <input type="password" id="password" placeholder="เลข 3 ตัวท้ายบัตรประชาชน" autocomplete="current-password">
+        </div>
+        <button class="login-btn" id="loginBtn">เข้าสู่ระบบ</button>
+        <div class="err-box" id="errBox"></div>
     </div>
+</div>
 
-    <!-- Portal Screen -->
-    <div class="portal-screen" id="portalScreen">
-        <div class="header">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo">TIS</div>
-                    <div class="header-text">
-                        <h1>ระบบสารสนเทศ TIS</h1>
-                        <p>THAI IDENTITY SUGAR FACTORY COMPANY LIMITED</p>
-                    </div>
-                </div>
-                <div class="user-info">
-                    <div class="stats-info" id="usageStats">
-                        <div class="stat-item">ผู้เข้าใช้วันนี้: <span id="todayUsers">-</span></div>
-                        <div class="stat-item">ทั้งหมด: <span id="totalUsers">-</span></div>
-                    </div>
-                    <div class="user-name" id="userName">ผู้ใช้งาน</div>
-                    <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
-                    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-                </div>
+<!-- ═══ PORTAL ═══════════════════════════════════ -->
+<div id="portalScreen">
+
+    <!-- HEADER -->
+    <header class="hdr">
+        <div class="hdr-left">
+            <button class="hamburger" id="hamburger">☰</button>
+            <div class="hdr-badge">TIS</div>
+            <div>
+                <div class="hdr-title">ระบบสารสนเทศ TIS</div>
+                <div class="hdr-sub">THAI IDENTITY SUGAR FACTORY COMPANY LIMITED</div>
             </div>
         </div>
-
-        <div class="container">
-            <div class="sidebar" id="sidebar">
-                <div class="sidebar-header">📋 เมนูระบบงาน</div>
-                
-                <!-- ระบบรายงานและสถิติ -->
-                <div class="menu-group">
-                    <div class="menu-header" onclick="toggleMenu(this)">
-                        <div><span class="menu-icon">📊</span>ระบบรายงานและสถิติ</div>
-                        <span class="chevron">▶</span>
-                    </div>
-                    <div class="menu-items">
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/PicRai/', 'ระบบสรุปอ้อยเข้า ประจำวัน Dash-Tis')">
-                            <div class="item-icon">📈</div>
-                            ระบบสรุปอ้อยเข้า ประจำวัน Dash-Tis
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ระบบการจัดการเอกสาร -->
-                <div class="menu-group">
-                    <div class="menu-header" onclick="toggleMenu(this)">
-                        <div><span class="menu-icon">📄</span>ระบบการจัดการเอกสาร</div>
-                        <span class="chevron">▶</span>
-                    </div>
-                    <div class="menu-items">
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/tishome/', 'ระบบสร้างเอกสาร QR')">
-                            <div class="item-icon">QR</div>
-                            ระบบสร้างเอกสาร QR
-                        </div>
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/signhubtis/', 'ระบบเซ็นต์อนุมัติหนังสือ Online')">
-                            <div class="item-icon">✔</div>
-                            ระบบเซ็นต์อนุมัติหนังสือ Online
-                        </div>
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/E-doc/', 'ระบบนำเข้าหนังสือ อล. ปี69')">
-                            <div class="item-icon">📝</div>
-                            ระบบนำเข้าหนังสือ อล. ปี68
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ระบบบุคลากร -->
-                <div class="menu-group">
-                    <div class="menu-header" onclick="toggleMenu(this)">
-                        <div><span class="menu-icon">👥</span>ระบบบุคลากร</div>
-                        <span class="chevron">▶</span>
-                    </div>
-                    <div class="menu-items">
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/Tispayroll/', 'ระบบคลังใบสลิปPayRoll')">
-                            <div class="item-icon">💰</div>
-                            ระบบคลังใบสลิปPayRoll
-                        </div>
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/emailslipTis/', 'ระบบยืนตรวจสอบ E-mail ใช้งาน')">
-                            <div class="item-icon">📧</div>
-                            ระบบยืนตรวจสอบ E-mail ใช้งาน
-                        </div>
-                         <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/checkin/', 'ระบบสะแกนเข้างาน SmartLocate:Autoset')">
-                            <div class="item-icon">☝</div>
-                            ระบบสะแกนเข้างาน ผ่านมือถือออโต้
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ระบบตรวจสอบและติดตาม -->
-                <div class="menu-group">
-                    <div class="menu-header" onclick="toggleMenu(this)">
-                        <div><span class="menu-icon">🔍</span>ระบบตรวจสอบและติดตาม</div>
-                        <span class="chevron">▶</span>
-                    </div>
-                    <div class="menu-items">
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/checklist/', 'ระบบตรวจเช็คความพร้อมอะใหล่ TYPE A')">
-                            <div class="item-icon">✅</div>
-                            ระบบตรวจเช็คความพร้อมอะใหล่ TYPE A
-                        </div>
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/DachTissugar/', 'ระบบติดตาม อ้อยหน่วยส่งเสริม')">
-                            <div class="item-icon">🌾</div>
-                            ระบบติดตาม อ้อยหน่วยส่งเสริม
-                        </div>
-                        <div class="menu-item" onclick="loadSystem('https://skywalker698.github.io/Cartis/', 'ระบบ จองใช้รถ')">
-                            <div class="item-icon">🚙</div>
-                            ระบบจองขอใช้รถ & วิเคราะห์ค่าเดินทางตรวจสอบน้ำมัน
-                        </div>
-                    </div>
-                </div>
+        <div class="hdr-right">
+            <div class="stat-chip">
+                <span class="stat-dot"></span>
+                ออนไลน์วันนี้ <strong id="todayUsers">—</strong>
             </div>
-
-            <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-            <div class="main-content">
-                <div class="content-header">
-                    <div class="content-title" id="contentTitle">ยินดีต้อนรับสู่ระบบสารสนเทศ TIS</div>
-                    <div class="content-subtitle" id="contentSubtitle">เลือกระบบที่ต้องการใช้งานจากเมนูด้านซ้าย</div>
-                </div>
-                
-                <div class="content-body">
-                    <div class="welcome-screen" id="welcomeScreen">
-                        <div class="welcome-icon">🛠️</div>
-                        <div class="welcome-title">ระบบสารสนเทศ TIS</div>
-                        <div class="welcome-text">
-                            เลือกระบบงานที่ต้องการใช้งานจากเมนูด้านซ้าย<br>
-                            ระบบจะแสดงผลในพื้นที่นี้
-                        </div>
-                    </div>
-                    
-                    <div class="loading" id="loading">
-                        <div class="spinner"></div>
-                        <div>กำลังโหลด...</div>
-                    </div>
-                    
-                    <iframe class="system-iframe" id="systemIframe"></iframe>
-                </div>
-            </div>
+            <div class="user-chip" id="userName">ผู้ใช้งาน</div>
+            <button class="btn-ghost" onclick="logout()">ออกจากระบบ</button>
         </div>
+    </header>
+
+    <div class="portal-body">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-lbl">เมนูระบบงาน</div>
+
+            <!-- 1. บันทึก & ตรวจสอบ -->
+            <div class="cat">
+                <div class="cat-hdr" onclick="toggleCat(this)">
+                    <div class="cat-left">
+                        <div class="cat-icon" style="background:rgba(52,152,219,0.15);">📋</div>
+                        <div>
+                            <div class="cat-name">บันทึก & ตรวจสอบคุณภาพ</div>
+                            <div class="cat-count">6 ระบบ</div>
+                        </div>
+                    </div>
+                    <span class="chevron-icon">▶</span>
+                </div>
+                <div class="cat-items">
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/checklist/','ระบบตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A</div>
+                            <span class="sys-tag">AI · SUGGEST</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Landid/','ระบบเพิ่ม ID แปลงอ้อยจากหน่วย')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">เพิ่ม ID แปลงอ้อยจากหน่วย</div>
+                            <span class="sys-tag">AUTO-SYNC</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/recheck/','ระบบตรวจมาตรฐาน QA-Engineering & Manager')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">ตรวจมาตรฐานการใช้งาน QA</div>
+                            <span class="sys-tag">ENGINEERING</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/tractor/','ระบบแจ้งข้อผิดพลาดภายในโรงงาน')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">แจ้งข้อผิดพลาดจุดงานในโรงงาน</div>
+                            <span class="sys-tag">TRACKING</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/E-doc/','ระบบบันทึกเลขหนังสือ อล. ภายใน')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">บันทึกเลขหนังสือ อล. ภายในโรงงาน</div>
+                            <span class="sys-tag">DOC</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/DachTissugar/','ระบบนำเข้าหนี้ตาย & หนี้ระงับ')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">นำเข้าหนี้ตาย & หนี้ระงับ</div>
+                            <span class="sys-tag">FINANCE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. สลิปเงินเดือน -->
+            <div class="cat">
+                <div class="cat-hdr" onclick="toggleCat(this)">
+                    <div class="cat-left">
+                        <div class="cat-icon" style="background:rgba(46,204,113,0.15);">💰</div>
+                        <div>
+                            <div class="cat-name">ระบบสลิปเงินเดือน</div>
+                            <div class="cat-count">2 ระบบ</div>
+                        </div>
+                    </div>
+                    <span class="chevron-icon">▶</span>
+                </div>
+                <div class="cat-items">
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/emailslip/','ระบบแจ้ง Email ขอสลิปเงินเดือน')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">แจ้ง Email ขอสลิปเงินเดือน</div>
+                            <span class="sys-tag">EMAIL</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Tispayroll/','ระบบขอไฟล์สลิปย้อนหลัง OTP')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">ขอไฟล์สลิปย้อนหลัง</div>
+                            <span class="sys-tag">OTP · VERIFY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. อนุมัติ & เอกสาร -->
+            <div class="cat">
+                <div class="cat-hdr" onclick="toggleCat(this)">
+                    <div class="cat-left">
+                        <div class="cat-icon" style="background:rgba(155,89,182,0.15);">📄</div>
+                        <div>
+                            <div class="cat-name">อนุมัติเอกสาร & จองห้องประชุม</div>
+                            <div class="cat-count">3 ระบบ</div>
+                        </div>
+                    </div>
+                    <span class="chevron-icon">▶</span>
+                </div>
+                <div class="cat-items">
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/signhubtis/','ระบบอนุมัติหนังสือ Online E-Signature')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">อนุมัติหนังสือ Online E-Signature</div>
+                            <span class="sys-tag">E-APPROVAL</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/tishome/','ระบบอัปโหลดไฟล์พร้อมสร้าง QR Code')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">อัปโหลดเอกสารประชุม + QR Code</div>
+                            <span class="sys-tag">QR · SHARE</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/tismeet/','ระบบจองห้องประชุม LINE Notification')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">จองห้องประชุม + LINE Notify</div>
+                            <span class="sys-tag">BOOKING</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Dashboard & AI -->
+            <div class="cat">
+                <div class="cat-hdr" onclick="toggleCat(this)">
+                    <div class="cat-left">
+                        <div class="cat-icon" style="background:rgba(231,76,60,0.15);">📊</div>
+                        <div>
+                            <div class="cat-name">Dashboard & วิเคราะห์ AI</div>
+                            <div class="cat-count">4 ระบบ</div>
+                        </div>
+                    </div>
+                    <span class="chevron-icon">▶</span>
+                </div>
+                <div class="cat-items">
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/PicRai/','ระบบอ้อยเข้า RealTime Scale & AutoMate')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">อ้อยเข้า RealTime — Scale & AutoMate</div>
+                            <span class="sys-tag">REALTIME</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Dashtis/','Dashboard Chemical-Lab TIS Sugar')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">Chemical-Lab ข้อมูลปีผลิตน้ำตาล</div>
+                            <span class="sys-tag">CHEM · LAB</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/sugartis/','AI-Agent คาดการณ์หยุดหีบอ้อย')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">AI คาดการณ์วันหยุดหีบอ้อย</div>
+                            <span class="sys-tag">AI · FORECAST</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/FiberTIS/','WatchDog รถใบอ้อย RealTime')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">WatchDog รถใบอ้อยแยกลาน RealTime</div>
+                            <span class="sys-tag">AI · SYNC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. จัดการทั่วไป -->
+            <div class="cat">
+                <div class="cat-hdr" onclick="toggleCat(this)">
+                    <div class="cat-left">
+                        <div class="cat-icon" style="background:rgba(241,196,15,0.12);">⚙️</div>
+                        <div>
+                            <div class="cat-name">การจัดการทั่วไปภายใน</div>
+                            <div class="cat-count">5 ระบบ</div>
+                        </div>
+                    </div>
+                    <span class="chevron-icon">▶</span>
+                </div>
+                <div class="cat-items">
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Carcheck/','ระบบเช็คเข้า-ออก พนักงาน Online')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">เช็คเข้า-ออก พนักงาน Online</div>
+                            <span class="sys-tag">ANALYSIS</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/checkin/','ระบบเข้าออกงาน GPS Auto Online')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">ลงเวลาเข้างาน GPS Auto Online</div>
+                            <span class="sys-tag">GPS · BIO</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Cartis/','ระบบจองรถในโรงงาน + วิเคราะห์ค่าใช้จ่าย')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">จองขอใช้รถโรงงาน + วิเคราะห์ค่าใช้จ่าย</div>
+                            <span class="sys-tag">FLEET</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/helptis/','ระบบแจ้งซ่อม IT — Ticket + AI Maintenance')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">แจ้งซ่อม IT — Ticket + AI Maintenance</div>
+                            <span class="sys-tag">HELPDESK</span>
+                        </div>
+                    </div>
+                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/salesystem/','ระบบหน้าร้าน Tool องค์กร + AI Upload')">
+                        <span class="sys-dot"></span>
+                        <div class="sys-text">
+                            <div class="sys-name">หน้าร้าน Tool องค์กร + AI Upload</div>
+                            <span class="sys-tag">STORE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="main-hdr">
+                <div class="main-title" id="mainTitle">ยินดีต้อนรับสู่ระบบสารสนเทศ TIS</div>
+                <div class="main-sub" id="mainSub">เลือกระบบจากเมนูด้านซ้าย หรือกดการ์ดด้านล่างเพื่อเริ่มใช้งาน</div>
+            </div>
+
+            <div class="content-area">
+                <!-- Welcome -->
+                <div class="welcome" id="welcomeScreen">
+                    <div class="welcome-ring">🏭</div>
+                    <h2>TIS Information System Portal</h2>
+                    <p>ระบบรวมศูนย์การจัดการ โรงงานน้ำตาลไทยเอกลักษณ์<br>เลือกระบบที่ต้องการจากเมนู หรือกดปุ่มด่วนด้านล่าง</p>
+                    <div class="quick-grid" id="quickGrid"></div>
+                </div>
+
+                <!-- Loader -->
+                <div class="loader" id="loader">
+                    <div class="spin-lg"></div>
+                    <div class="loader-text">กำลังโหลดระบบ…</div>
+                </div>
+
+                <!-- Iframe -->
+                <iframe id="sysIframe" allowfullscreen></iframe>
+            </div>
+        </main>
     </div>
+</div>
 
-    <script>
-        // ==========================================
-        // Global Variables and Constants
-        // ==========================================
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec';
-        const GOOGLE_SHEETS_ID = '1d9heXjqVSKvguPQM00KMErlLEjxzLq7xc3wLYx5Lp1I';
-        const LOGIN_SHEET_NAME = 'Login';
-        
-        let currentActiveItem = null;
-        let isMobile = window.innerWidth <= 768;
-        let sessionId = generateSessionId();
-        let visitStartTime = new Date();
-        let currentUser = null;
+<script>
+// ═══ CONFIG ════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec';
+const SHEET_ID = '1d9heXjqVSKvguPQM00KMErlLEjxzLq7xc3wLYx5Lp1I';
+const LOGIN_SHEET = 'Login';
 
-        // ==========================================
-        // Utility Functions
-        // ==========================================
-        function generateSessionId() {
-            return 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        }
+// Quick-access systems shown on welcome screen
+const QUICK_SYSTEMS = [
+    { icon:'📈', name:'อ้อยเข้า RealTime', url:'https://skywalker698.github.io/PicRai/', title:'ระบบอ้อยเข้า RealTime' },
+    { icon:'🤖', name:'AI คาดการณ์หยุดหีบ', url:'https://skywalker698.github.io/sugartis/', title:'AI คาดการณ์หยุดหีบอ้อย' },
+    { icon:'📋', name:'แจ้งซ่อม IT', url:'https://skywalker698.github.io/helptis/', title:'แจ้งซ่อม IT Ticket' },
+    { icon:'📅', name:'จองห้องประชุม', url:'https://skywalker698.github.io/tismeet/', title:'จองห้องประชุม LINE Notify' },
+    { icon:'💰', name:'สลิปเงินเดือน', url:'https://skywalker698.github.io/Tispayroll/', title:'สลิปเงินเดือน OTP' },
+    { icon:'🚗', name:'จองขอใช้รถ', url:'https://skywalker698.github.io/Cartis/', title:'จองรถโรงงาน' },
+];
 
-        function getClientInfo() {
-            return {
-                userAgent: navigator.userAgent,
-                screen: `${screen.width}x${screen.height}`,
-                language: navigator.language,
-                platform: navigator.platform,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-            };
-        }
+// ═══ STATE ═════════════════════════════════════
+let currentUser = null;
+let activeItem = null;
+const sessionId = 'ses_' + Math.random().toString(36).slice(2,9) + '_' + Date.now();
+const startTime = Date.now();
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
+// ═══ LOGIN ═════════════════════════════════════
+async function doLogin() {
+    const userId = document.getElementById('userId').value.trim();
+    const pass   = document.getElementById('password').value.trim();
+    const btn    = document.getElementById('loginBtn');
+    const err    = document.getElementById('errBox');
 
-        function showLoginLoading(show) {
-            const button = document.getElementById('loginButton');
-            if (show) {
-                button.disabled = true;
-                button.innerHTML = '<div class="loading-spinner"></div>กำลังตรวจสอบ...';
-            } else {
-                button.disabled = false;
-                button.innerHTML = 'เข้าสู่ระบบ';
-            }
-        }
+    err.style.display = 'none';
+    if (!userId || !pass) { showErr('กรุณากรอกข้อมูลให้ครบถ้วน'); return; }
 
-        // ==========================================
-        // Authentication Functions
-        // ==========================================
-        async function checkLoginOnline(userId, password) {
-            return new Promise((resolve) => {
-                try {
-                    // สร้าง callback function สำหรับ Google Visualization API
-                    const callbackName = 'google.visualization.Query.setResponse';
-                    
-                    // บันทึก callback เดิม (ถ้ามี)
-                    const originalCallback = window.google?.visualization?.Query?.setResponse;
-                    
-                    // สร้าง Google Visualization namespace หากไม่มี
-                    if (!window.google) window.google = {};
-                    if (!window.google.visualization) window.google.visualization = {};
-                    if (!window.google.visualization.Query) window.google.visualization.Query = {};
-                    
-                    // ตั้งค่า callback function
-                    window.google.visualization.Query.setResponse = function(data) {
-                        try {
-                            // ตรวจสอบว่ามีข้อมูลหรือไม่
-                            if (!data.table || !data.table.rows) {
-                                resolve({ 
-                                    success: false, 
-                                    message: 'ไม่พบข้อมูลในฐานข้อมูล' 
-                                });
-                                return;
-                            }
-                            
-                            // ตรวจสอบข้อมูลผู้ใช้
-                            const rows = data.table.rows;
-                            for (let row of rows) {
-                                // ตรวจสอบว่า row.c มีข้อมูลครบหรือไม่
-                                if (!row.c || row.c.length < 3) continue;
-                                
-                                const id = row.c[0]?.v?.toString().trim() || '';
-                                const pass = row.c[1]?.v?.toString().trim() || '';
-                                const fullname = row.c[2]?.v?.toString().trim() || '';
-                                
-                                // ข้าม row ที่เป็นหัวตารางหรือข้อมูลว่าง
-                                if (id === 'ID' || id === '' || pass === '') continue;
-                                
-                                // ตรวจสอบข้อมูลการเข้าสู่ระบบ
-                                if (id === userId && pass === password) {
-                                    resolve({
-                                        success: true,
-                                        user: {
-                                            id: id,
-                                            fullname: fullname
-                                        }
-                                    });
-                                    return;
-                                }
-                            }
-                            
-                            resolve({ 
-                                success: false, 
-                                message: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' 
-                            });
-                            
-                        } catch (error) {
-                            console.error('Error processing login data:', error);
-                            resolve({ 
-                                success: false, 
-                                message: 'เกิดข้อผิดพลาดในการประมวลผลข้อมูล' 
-                            });
-                        } finally {
-                            // คืนค่า callback เดิม
-                            if (originalCallback) {
-                                window.google.visualization.Query.setResponse = originalCallback;
-                            }
-                            // ลบ script tag
-                            if (document.head.contains(script)) {
-                                document.head.removeChild(script);
-                            }
-                        }
-                    };
-                    
-                    // สร้าง script tag
-                    const script = document.createElement('script');
-                    const loginUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_ID}/gviz/tq?tqx=out:json&sheet=${LOGIN_SHEET_NAME}`;
-                    script.src = loginUrl;
-                    
-                    script.onerror = function() {
-                        resolve({ 
-                            success: false, 
-                            message: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต' 
-                        });
-                        // คืนค่า callback เดิม
-                        if (originalCallback) {
-                            window.google.visualization.Query.setResponse = originalCallback;
-                        }
-                        if (document.head.contains(script)) {
-                            document.head.removeChild(script);
-                        }
-                    };
-                    
-                    // กำหนด timeout
-                    setTimeout(() => {
-                        if (window.google.visualization.Query.setResponse !== originalCallback) {
-                            resolve({ 
-                                success: false, 
-                                message: 'การเชื่อมต่อฐานข้อมูลหมดเวลา กรุณาลองใหม่อีกครั้ง' 
-                            });
-                            // คืนค่า callback เดิม
-                            if (originalCallback) {
-                                window.google.visualization.Query.setResponse = originalCallback;
-                            }
-                            if (document.head.contains(script)) {
-                                document.head.removeChild(script);
-                            }
-                        }
-                    }, 10000); // 10 วินาที timeout
-                    
-                    document.head.appendChild(script);
-                    
-                } catch (error) {
-                    console.error('เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล:', error);
-                    resolve({ 
-                        success: false, 
-                        message: 'เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง' 
-                    });
-                }
-            });
-        }
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spin-sm"></div>กำลังตรวจสอบ…';
 
-        async function handleLogin() {
-            const userId = document.getElementById('userId').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            // ตรวจสอบข้อมูลที่กรอก
-            if (!userId || !password) {
-                showError('กรุณากรอกรหัสผู้ใช้และรหัสผ่าน');
-                return;
-            }
-            
-            showLoginLoading(true);
-            
+    const result = await checkCredentials(userId, pass);
+
+    btn.disabled = false;
+    btn.innerHTML = 'เข้าสู่ระบบ';
+
+    if (result.ok) {
+        currentUser = result.user;
+        trackAction('login', { userId: result.user.id });
+        showPortal();
+    } else {
+        showErr(result.msg);
+    }
+}
+
+function showErr(msg) {
+    const e = document.getElementById('errBox');
+    e.textContent = msg; e.style.display = 'block';
+    setTimeout(() => e.style.display = 'none', 5000);
+}
+
+function checkCredentials(userId, pass) {
+    return new Promise(resolve => {
+        const ns = window.google = window.google || {};
+        ns.visualization = ns.visualization || {};
+        ns.visualization.Query = ns.visualization.Query || {};
+
+        const prev = ns.visualization.Query.setResponse;
+        let script;
+
+        const cleanup = () => {
+            ns.visualization.Query.setResponse = prev;
+            if (script && document.head.contains(script)) document.head.removeChild(script);
+        };
+
+        const timer = setTimeout(() => {
+            cleanup();
+            resolve({ ok: false, msg: 'การเชื่อมต่อหมดเวลา กรุณาลองใหม่' });
+        }, 12000);
+
+        ns.visualization.Query.setResponse = data => {
+            clearTimeout(timer);
             try {
-                const result = await checkLoginOnline(userId, password);
-                
-                if (result.success) {
-                    currentUser = result.user;
-                    
-                    // บันทึกการเข้าสู่ระบบ
-                    await trackLogin(currentUser);
-                    
-                    // เปลี่ยนไปยังหน้า Portal
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('portalScreen').style.display = 'block';
-                    document.getElementById('userName').textContent = currentUser.fullname;
-                    
-                    // เริ่มต้นระบบ Portal
-                    initializePortal();
-                } else {
-                    showError(result.message);
+                const rows = data?.table?.rows || [];
+                for (const row of rows) {
+                    if (!row.c || row.c.length < 3) continue;
+                    const id   = row.c[0]?.v?.toString().trim() || '';
+                    const pw   = row.c[1]?.v?.toString().trim() || '';
+                    const name = row.c[2]?.v?.toString().trim() || '';
+                    if (id === 'ID' || !id || !pw) continue;
+                    if (id === userId && pw === pass) {
+                        cleanup();
+                        return resolve({ ok: true, user: { id, name } });
+                    }
                 }
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง');
-            } finally {
-                showLoginLoading(false);
+                cleanup();
+                resolve({ ok: false, msg: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+            } catch {
+                cleanup();
+                resolve({ ok: false, msg: 'เกิดข้อผิดพลาดในการตรวจสอบ' });
             }
+        };
+
+        script = document.createElement('script');
+        script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${LOGIN_SHEET}`;
+        script.onerror = () => { clearTimeout(timer); cleanup(); resolve({ ok: false, msg: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้' }); };
+        document.head.appendChild(script);
+    });
+}
+
+// ═══ PORTAL ════════════════════════════════════
+function showPortal() {
+    document.getElementById('loginScreen').style.display = 'none';
+    const p = document.getElementById('portalScreen');
+    p.style.display = 'flex';
+    document.getElementById('userName').textContent = currentUser.name || currentUser.id;
+    buildQuickGrid();
+    getStats();
+    setInterval(getStats, 5 * 60 * 1000);
+    // Auto-open first category
+    const firstHdr = document.querySelector('.cat-hdr');
+    if (firstHdr) toggleCat(firstHdr);
+}
+
+function buildQuickGrid() {
+    const grid = document.getElementById('quickGrid');
+    grid.innerHTML = QUICK_SYSTEMS.map(s =>
+        `<div class="quick-card" onclick="loadSys('${s.url}','${s.title}')">
+            <div class="qc-icon">${s.icon}</div>
+            <div class="qc-name">${s.name}</div>
+        </div>`
+    ).join('');
+}
+
+function logout() {
+    if (!confirm('ต้องการออกจากระบบหรือไม่?')) return;
+    currentUser = null; activeItem = null;
+    document.getElementById('portalScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('userId').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('sysIframe').src = '';
+    resetContent();
+    // Reset all cats
+    document.querySelectorAll('.cat-hdr').forEach(h => h.classList.remove('open'));
+    document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
+}
+
+function resetContent() {
+    document.getElementById('welcomeScreen').style.display = 'flex';
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('sysIframe').style.display = 'none';
+    document.getElementById('mainTitle').textContent = 'ยินดีต้อนรับสู่ระบบสารสนเทศ TIS';
+    document.getElementById('mainSub').textContent = 'เลือกระบบจากเมนู หรือกดการ์ดด่วนด้านล่าง';
+}
+
+// ═══ NAVIGATION ════════════════════════════════
+function toggleCat(hdr) {
+    const isOpen = hdr.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.cat-hdr').forEach(h => h.classList.remove('open'));
+    document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
+    if (!isOpen) {
+        hdr.classList.add('open');
+        hdr.nextElementSibling.classList.add('open');
+    }
+}
+
+function loadSys(url, title) {
+    // Update active menu item
+    if (activeItem) activeItem.classList.remove('active');
+    const items = document.querySelectorAll('.sys-item');
+    for (const item of items) {
+        if (item.getAttribute('onclick')?.includes(url)) {
+            item.classList.add('active');
+            activeItem = item;
+            break;
         }
+    }
 
-        function logout() {
-            if (confirm('ต้องการออกจากระบบหรือไม่?')) {
-                currentUser = null;
-                
-                // รีเซ็ตหน้าจอ
-                document.getElementById('portalScreen').style.display = 'none';
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('userId').value = '';
-                document.getElementById('password').value = '';
-                document.getElementById('systemIframe').src = '';
-                
-                // รีเซ็ต content area
-                document.getElementById('welcomeScreen').style.display = 'flex';
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('systemIframe').style.display = 'none';
-                
-                // รีเซ็ต menu state
-                if (currentActiveItem) {
-                    currentActiveItem.classList.remove('active');
-                    currentActiveItem = null;
-                }
-                
-                // รีเซ็ต menu groups
-                document.querySelectorAll('.menu-group').forEach(group => {
-                    group.classList.remove('expanded');
-                    group.querySelector('.menu-header').classList.remove('active');
-                });
-            }
-        }
+    document.getElementById('mainTitle').textContent = title;
+    document.getElementById('mainSub').textContent = 'กำลังโหลดระบบ…';
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('loader').style.display = 'flex';
+    document.getElementById('sysIframe').style.display = 'none';
 
-        // ==========================================
-        // Analytics and Tracking Functions
-        // ==========================================
-        async function trackLogin(user) {
-            try {
-                const data = {
-                    action: 'login',
-                    sessionId: sessionId,
-                    timestamp: new Date().toISOString(),
-                    userId: user.id,
-                    fullname: user.fullname,
-                    ...getClientInfo()
-                };
+    trackAction('open_system', { url, title });
 
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-            } catch (error) {
-                console.log('การส่งข้อมูลล็อกอินล้มเหลว:', error);
-            }
-        }
+    const iframe = document.getElementById('sysIframe');
+    iframe.src = 'about:blank';
+    setTimeout(() => { iframe.src = url; }, 80);
 
-        async function trackVisit() {
-            try {
-                const clientInfo = getClientInfo();
-                const data = {
-                    action: 'visit',
-                    sessionId: sessionId,
-                    timestamp: new Date().toISOString(),
-                    page: 'portal_home',
-                    userId: currentUser?.id,
-                    ...clientInfo
-                };
+    iframe.onload = () => {
+        if (iframe.src === 'about:blank') return;
+        document.getElementById('loader').style.display = 'none';
+        iframe.style.display = 'block';
+        document.getElementById('mainSub').textContent = 'ระบบพร้อมใช้งาน';
+    };
+    iframe.onerror = () => {
+        document.getElementById('loader').style.display = 'none';
+        resetContent();
+        document.getElementById('mainSub').textContent = 'เกิดข้อผิดพลาดในการโหลด';
+    };
 
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-            } catch (error) {
-                console.log('การส่งข้อมูลสถิติล้มเหลว:', error);
-            }
-        }
+    // Close sidebar on mobile
+    if (window.innerWidth <= 768) closeSidebar();
+}
 
-        async function trackSystemAccess(systemUrl, systemName) {
-            try {
-                const data = {
-                    action: 'system_access',
-                    sessionId: sessionId,
-                    timestamp: new Date().toISOString(),
-                    systemUrl: systemUrl,
-                    systemName: systemName,
-                    userId: currentUser?.id,
-                    ...getClientInfo()
-                };
+// ═══ SIDEBAR MOBILE ════════════════════════════
+function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb.classList.contains('open')) {
+        sb.classList.remove('open'); ov.classList.remove('active');
+    } else {
+        sb.classList.add('open'); ov.classList.add('active');
+    }
+}
 
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-            } catch (error) {
-                console.log('การส่งข้อมูลสถิติระบบล้มเหลว:', error);
-            }
-        }
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('active');
+}
 
-        async function getUsageStats() {
-            try {
-                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=stats');
-                const data = await response.json();
-                
-                document.getElementById('todayUsers').textContent = data.todayUsers || '0';
-                document.getElementById('totalUsers').textContent = data.totalUsers || '0';
-            } catch (error) {
-                console.log('การดึงข้อมูลสถิติล้มเหลว:', error);
-                document.getElementById('todayUsers').textContent = '-';
-                document.getElementById('totalUsers').textContent = '-';
-            }
-        }
-
-        // ==========================================
-        // Menu and Navigation Functions
-        // ==========================================
-        function toggleMenu(header) {
-            const menuGroup = header.parentElement;
-            const isExpanded = menuGroup.classList.contains('expanded');
-            
-            // ปิดเมนูอื่นๆ
-            document.querySelectorAll('.menu-group').forEach(group => {
-                group.classList.remove('expanded');
-                group.querySelector('.menu-header').classList.remove('active');
-            });
-            
-            // เปิดเมนูที่คลิก (ถ้ายังไม่เปิด)
-            if (!isExpanded) {
-                menuGroup.classList.add('expanded');
-                header.classList.add('active');
-            }
-        }
-
-        function loadSystemDirectly(url, title) {
-            const iframe = document.getElementById('systemIframe');
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const loading = document.getElementById('loading');
-            const contentTitle = document.getElementById('contentTitle');
-            const contentSubtitle = document.getElementById('contentSubtitle');
-
-            // อัพเดตหัวข้อ
-            contentTitle.textContent = title;
-            contentSubtitle.textContent = 'กำลังโหลดระบบ...';
-
-            // แสดง loading state
-            welcomeScreen.style.display = 'none';
-            iframe.style.display = 'none';
-            loading.style.display = 'block';
-
-            // บันทึกสถิติการเข้าใช้ระบบ
-            trackSystemAccess(url, title);
-
-            // รีเซ็ต iframe ก่อนโหลดใหม่
-            iframe.src = 'about:blank';
-            
-            // โหลด iframe ใหม่หลังจาก delay สั้นๆ
-            setTimeout(() => {
-                iframe.src = url;
-            }, 100);
-            
-            // จัดการ iframe load events
-            iframe.onload = function() {
-                if (iframe.src !== 'about:blank') {
-                    loading.style.display = 'none';
-                    iframe.style.display = 'block';
-                    contentSubtitle.textContent = 'ระบบพร้อมใช้งาน';
-                }
-            };
-
-            iframe.onerror = function() {
-                loading.style.display = 'none';
-                welcomeScreen.style.display = 'flex';
-                contentSubtitle.textContent = 'เกิดข้อผิดพลาดในการโหลดระบบ';
-            };
-
-            // เลือก menu item ที่เกี่ยวข้อง
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // หา menu item ที่ตรงกับระบบ Dashboard
-            const matchingItem = Array.from(document.querySelectorAll('.menu-item')).find(item => 
-                item.textContent.includes('ระบบสรุปอ้อยเข้า')
-            );
-            if (matchingItem) {
-                matchingItem.classList.add('active');
-                currentActiveItem = matchingItem;
-            }
-        }
-
-        function loadSystem(url, title) {
-            const iframe = document.getElementById('systemIframe');
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const loading = document.getElementById('loading');
-            const contentTitle = document.getElementById('contentTitle');
-            const contentSubtitle = document.getElementById('contentSubtitle');
-
-            // อัพเดต active item
-            if (currentActiveItem) {
-                currentActiveItem.classList.remove('active');
-            }
-            
-            // หา element ที่ถูกคลิก
-            const clickedElement = event?.target?.closest('.menu-item') || 
-                                 Array.from(document.querySelectorAll('.menu-item')).find(item => 
-                                   item.textContent.includes(title.split(' ')[0])
-                                 );
-            
-            if (clickedElement) {
-                clickedElement.classList.add('active');
-                currentActiveItem = clickedElement;
-            }
-
-            // อัพเดตหัวข้อ
-            contentTitle.textContent = title;
-            contentSubtitle.textContent = 'กำลังโหลดระบบ...';
-
-            // แสดง loading state
-            welcomeScreen.style.display = 'none';
-            iframe.style.display = 'none';
-            loading.style.display = 'block';
-
-            // บันทึกสถิติการเข้าใช้ระบบ
-            trackSystemAccess(url, title);
-
-            // รีเซ็ต iframe ก่อนโหลดใหม่
-            iframe.src = 'about:blank';
-            
-            // โหลด iframe ใหม่หลังจาก delay สั้นๆ
-            setTimeout(() => {
-                iframe.src = url;
-            }, 100);
-            
-            // จัดการ iframe load events
-            iframe.onload = function() {
-                if (iframe.src !== 'about:blank') {
-                    loading.style.display = 'none';
-                    iframe.style.display = 'block';
-                    contentSubtitle.textContent = 'ระบบพร้อมใช้งาน';
-                }
-            };
-
-            iframe.onerror = function() {
-                loading.style.display = 'none';
-                welcomeScreen.style.display = 'flex';
-                contentSubtitle.textContent = 'เกิดข้อผิดพลาดในการโหลดระบบ';
-                
-                // รีเซ็ต active state หากเกิด error
-                if (currentActiveItem) {
-                    currentActiveItem.classList.remove('active');
-                    currentActiveItem = null;
-                }
-            };
-
-            // ปิด sidebar บนมือถือหลังจากเลือกเมนู
-            if (isMobile) {
-                toggleSidebar();
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            } else {
-                sidebar.classList.add('open');
-                overlay.classList.add('active');
-            }
-        }
-
-        // ==========================================
-        // Initialization Functions
-        // ==========================================
-        function initializePortal() {
-            // เปิดเมนูแรก (ระบบรายงานและสถิติ)
-            const firstMenu = document.querySelector('.menu-header');
-            if (firstMenu) {
-                toggleMenu(firstMenu);
-            }
-            
-            // โหลดหน้า Dashboard เป็นหน้าแรกหลังจาก delay สั้นๆ
-            setTimeout(() => {
-                loadSystemDirectly('https://skywalker698.github.io/PicRai/', 'ระบบสรุปอ้อยเข้า ประจำวัน Dash-Tis');
-            }, 1000);
-            
-            // บันทึกการเข้าชม
-            trackVisit();
-            
-            // ดึงสถิติการใช้งาน
-            getUsageStats();
-            
-            // อัพเดตสถิติทุก 5 นาที
-            setInterval(getUsageStats, 5 * 60 * 1000);
-        }
-
-        // ==========================================
-        // Event Handlers and Responsive Design
-        // ==========================================
-        window.addEventListener('resize', function() {
-            const newIsMobile = window.innerWidth <= 768;
-            
-            if (newIsMobile !== isMobile) {
-                isMobile = newIsMobile;
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('overlay');
-                
-                if (!isMobile) {
-                    sidebar.classList.remove('open');
-                    overlay.classList.remove('active');
-                }
-            }
+// ═══ ANALYTICS ═════════════════════════════════
+function trackAction(action, extra = {}) {
+    try {
+        fetch(GAS_URL, {
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, sessionId, userId: currentUser?.id, ts: new Date().toISOString(), ...extra })
         });
+    } catch {}
+}
 
-        // ส่งข้อมูลเมื่อปิดหน้าต่าง
-        window.addEventListener('beforeunload', function() {
-            const visitDuration = Math.floor((new Date() - visitStartTime) / 1000);
-            
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon(GOOGLE_SCRIPT_URL, JSON.stringify({
-                    action: 'visit_end',
-                    sessionId: sessionId,
-                    timestamp: new Date().toISOString(),
-                    duration: visitDuration,
-                    userId: currentUser?.id
-                }));
-            }
-        });
+async function getStats() {
+    try {
+        const r = await fetch(GAS_URL + '?action=stats');
+        const d = await r.json();
+        document.getElementById('todayUsers').textContent = d.todayUsers ?? '—';
+    } catch {}
+}
 
-        // ==========================================
-        // DOM Ready and Event Listeners
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Login button event listener
-            document.getElementById('loginButton').addEventListener('click', handleLogin);
-            
-            // Enter key event listeners
-            document.getElementById('userId').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('password').focus();
-                }
-            });
-            
-            document.getElementById('password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    handleLogin();
-                }
-            });
+// ═══ EVENTS ════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loginBtn').addEventListener('click', doLogin);
+    document.getElementById('userId').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password').focus(); });
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('hamburger').addEventListener('click', toggleSidebar);
+});
 
-            // Input validation and error clearing
-            document.getElementById('userId').addEventListener('input', function() {
-                const errorDiv = document.getElementById('errorMessage');
-                if (errorDiv.style.display === 'block') {
-                    errorDiv.style.display = 'none';
-                }
-                this.classList.remove('error');
-            });
-
-            document.getElementById('password').addEventListener('input', function() {
-                const errorDiv = document.getElementById('errorMessage');
-                if (errorDiv.style.display === 'block') {
-                    errorDiv.style.display = 'none';
-                }
-                this.classList.remove('error');
-            });
-
-            // เริ่มต้นด้วยหน้า Login
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('portalScreen').style.display = 'none';
-            
-            console.log('TIS Portal System initialized successfully');
-        });
-
-        // ==========================================
-        // Error Handling for Uncaught Errors
-        // ==========================================
-        window.addEventListener('error', function(e) {
-            console.error('JavaScript Error:', e.error);
-            
-            // หากเกิด error ขณะ login
-            const loginScreen = document.getElementById('loginScreen');
-            if (loginScreen && loginScreen.style.display !== 'none') {
-                showLoginLoading(false);
-                showError('เกิดข้อผิดพลาดในระบบ กรุณารีเฟรชหน้าเว็บและลองใหม่');
-            }
-        });
-
-        // Prevent iframe security errors
-        window.addEventListener('message', function(e) {
-            // จัดการ postMessage จาก iframe หากจำเป็น
-            // สามารถเพิ่มการจัดการ communication ระหว่าง parent และ iframe ได้ที่นี่
-        });
-
-    </script>
+window.addEventListener('beforeunload', () => {
+    const dur = Math.floor((Date.now() - startTime) / 1000);
+    navigator.sendBeacon?.(GAS_URL, JSON.stringify({ action: 'session_end', sessionId, userId: currentUser?.id, dur }));
+});
+</script>
 </body>
 </html>
