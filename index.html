@@ -1,985 +1,1473 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIS Portal — ระบบสารสนเทศ</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --navy: #0d1b2a;
-            --navy-mid: #1b2d42;
-            --navy-light: #243447;
-            --gold: #c9a84c;
-            --gold-light: #e2c27d;
-            --gold-dim: #7a5e28;
-            --cream: #f5f0e8;
-            --white: #ffffff;
-            --muted: #8a9bb0;
-            --border: rgba(201,168,76,0.18);
-            --sidebar-w: 290px;
-            --header-h: 64px;
-            --radius: 8px;
-            --shadow: 0 4px 24px rgba(0,0,0,0.18);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'IBM Plex Sans Thai', sans-serif;
-            background: var(--navy);
-            color: var(--white);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ─── LOGIN ─────────────────────────────────── */
-        #loginScreen {
-            position: fixed; inset: 0; z-index: 999;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--navy);
-            background-image:
-                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(201,168,76,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 60% at 80% 20%, rgba(13,27,42,0.6) 0%, transparent 70%);
-        }
-
-        .login-card {
-            background: var(--navy-mid);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 3rem 2.5rem 2.5rem;
-            width: 100%; max-width: 400px;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        }
-
-        .login-emblem {
-            width: 72px; height: 72px;
-            border: 2px solid var(--gold);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.1rem; font-weight: 500;
-            color: var(--gold);
-            letter-spacing: 1px;
-        }
-
-        .login-card h1 {
-            text-align: center;
-            font-size: 1.5rem; font-weight: 600;
-            color: var(--white);
-            margin-bottom: 0.25rem;
-        }
-
-        .login-card .sub {
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.82rem;
-            margin-bottom: 2rem;
-            letter-spacing: 0.5px;
-        }
-
-        .field { margin-bottom: 1.25rem; }
-
-        .field label {
-            display: block;
-            font-size: 0.78rem; font-weight: 500;
-            color: var(--muted);
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 0.4rem;
-        }
-
-        .field input {
-            width: 100%;
-            background: var(--navy);
-            border: 1px solid rgba(201,168,76,0.25);
-            border-radius: var(--radius);
-            color: var(--white);
-            padding: 0.7rem 1rem;
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .field input::placeholder { color: var(--muted); font-size: 0.85rem; }
-        .field input:focus { outline: none; border-color: var(--gold); }
-
-        .login-btn {
-            width: 100%; padding: 0.8rem;
-            background: var(--gold);
-            color: var(--navy);
-            border: none; border-radius: var(--radius);
-            font-family: inherit; font-size: 0.95rem; font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .login-btn:hover { background: var(--gold-light); }
-        .login-btn:active { transform: scale(0.99); }
-        .login-btn:disabled { background: var(--gold-dim); cursor: not-allowed; }
-
-        .err-box {
-            background: rgba(220,60,60,0.12);
-            border: 1px solid rgba(220,60,60,0.3);
-            border-radius: var(--radius);
-            color: #f08080;
-            font-size: 0.85rem; padding: 0.65rem 0.9rem;
-            margin-top: 0.75rem; display: none;
-        }
-
-        .spin-sm {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(13,27,42,0.3);
-            border-top-color: var(--navy);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        /* ─── PORTAL ─────────────────────────────────── */
-        #portalScreen { display: none; flex-direction: column; height: 100vh; }
-
-        /* HEADER */
-        .hdr {
-            height: var(--header-h);
-            background: var(--navy-mid);
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 1.25rem;
-            flex-shrink: 0;
-            position: sticky; top: 0; z-index: 100;
-        }
-
-        .hdr-left { display: flex; align-items: center; gap: 0.9rem; }
-
-        .hdr-badge {
-            width: 40px; height: 40px;
-            border: 1.5px solid var(--gold);
-            border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem; font-weight: 500; color: var(--gold);
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
-        }
-
-        .hdr-title { font-size: 1.05rem; font-weight: 600; color: var(--white); line-height: 1.2; }
-        .hdr-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.5px; }
-
-        .hdr-right { display: flex; align-items: center; gap: 0.75rem; }
-
-        .stat-chip {
-            background: rgba(201,168,76,0.1);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 0.25rem 0.65rem;
-            font-size: 0.72rem; color: var(--gold-light);
-            display: flex; align-items: center; gap: 0.3rem;
-        }
-
-        .stat-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
-
-        .user-chip {
-            font-size: 0.82rem; color: var(--muted);
-            max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-
-        .btn-ghost {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius);
-            color: var(--muted);
-            padding: 0.4rem 0.8rem;
-            font-family: inherit; font-size: 0.8rem;
-            cursor: pointer; transition: all 0.2s;
-        }
-
-        .btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--white); }
-
-        .hamburger {
-            display: none;
-            background: none; border: none;
-            color: var(--muted); font-size: 1.3rem;
-            cursor: pointer; padding: 0.3rem;
-        }
-
-        /* BODY LAYOUT */
-        .portal-body { display: flex; flex: 1; overflow: hidden; height: calc(100vh - var(--header-h)); }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: var(--navy-mid);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar::-webkit-scrollbar { width: 4px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 4px; }
-
-        .sidebar-lbl {
-            padding: 0.75rem 1rem 0.5rem;
-            font-size: 0.65rem; font-weight: 600;
-            color: var(--gold);
-            text-transform: uppercase; letter-spacing: 1.5px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        /* Category groups */
-        .cat { border-bottom: 1px solid rgba(201,168,76,0.08); }
-
-        .cat-hdr {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            user-select: none;
-        }
-
-        .cat-hdr:hover { background: rgba(201,168,76,0.05); }
-        .cat-hdr.open { background: rgba(201,168,76,0.07); }
-
-        .cat-left { display: flex; align-items: center; gap: 0.65rem; }
-
-        .cat-icon {
-            width: 28px; height: 28px;
-            border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem; flex-shrink: 0;
-        }
-
-        .cat-name { font-size: 0.82rem; font-weight: 500; color: var(--white); }
-        .cat-count { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
-
-        .chevron-icon {
-            font-size: 0.6rem; color: var(--muted);
-            transition: transform 0.25s;
-        }
-
-        .cat-hdr.open .chevron-icon { transform: rotate(90deg); }
-
-        .cat-items { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-        .cat-items.open { max-height: 600px; }
-
-        .sys-item {
-            display: flex; align-items: flex-start; gap: 0.65rem;
-            padding: 0.6rem 1rem 0.6rem 1.5rem;
-            cursor: pointer;
-            border-left: 2px solid transparent;
-            transition: all 0.15s;
-        }
-
-        .sys-item:hover {
-            background: rgba(201,168,76,0.06);
-            border-left-color: rgba(201,168,76,0.4);
-        }
-
-        .sys-item.active {
-            background: rgba(201,168,76,0.1);
-            border-left-color: var(--gold);
-        }
-
-        .sys-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%; background: var(--muted);
-            margin-top: 0.45rem; flex-shrink: 0;
-            transition: background 0.15s;
-        }
-
-        .sys-item.active .sys-dot, .sys-item:hover .sys-dot { background: var(--gold); }
-
-        .sys-text { flex: 1; }
-        .sys-name { font-size: 0.8rem; color: #c8d4e0; line-height: 1.35; }
-        .sys-item.active .sys-name { color: var(--gold-light); font-weight: 500; }
-        .sys-tag {
-            display: inline-block;
-            font-size: 0.6rem; font-family: 'IBM Plex Mono', monospace;
-            background: rgba(201,168,76,0.12);
-            color: var(--gold-dim);
-            border-radius: 3px; padding: 0.05rem 0.3rem;
-            margin-top: 0.2rem; letter-spacing: 0.5px;
-        }
-
-        /* MAIN CONTENT */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        .main-hdr {
-            padding: 0.75rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            background: var(--navy-light);
-            flex-shrink: 0;
-        }
-
-        .main-title { font-size: 0.95rem; font-weight: 600; color: var(--white); }
-        .main-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
-
-        .content-area { flex: 1; position: relative; overflow: hidden; }
-
-        /* Welcome */
-        .welcome {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 2rem;
-            background: var(--navy);
-        }
-
-        .welcome-ring {
-            width: 80px; height: 80px;
-            border: 1.5px solid var(--border);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; margin-bottom: 1.25rem;
-        }
-
-        .welcome h2 { font-size: 1.2rem; font-weight: 600; color: var(--white); margin-bottom: 0.5rem; }
-        .welcome p { color: var(--muted); font-size: 0.875rem; line-height: 1.6; max-width: 360px; }
-
-        /* Quick cards on welcome */
-        .quick-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 0.75rem; margin-top: 2rem; width: 100%; max-width: 640px;
-        }
-
-        .quick-card {
-            background: var(--navy-mid);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-        }
-
-        .quick-card:hover {
-            border-color: var(--gold);
-            background: rgba(201,168,76,0.06);
-            transform: translateY(-1px);
-        }
-
-        .qc-icon { font-size: 1.3rem; margin-bottom: 0.4rem; }
-        .qc-name { font-size: 0.75rem; font-weight: 500; color: #c8d4e0; line-height: 1.3; }
-
-        /* Loading */
-        .loader {
-            position: absolute; inset: 0;
-            display: none; flex-direction: column;
-            align-items: center; justify-content: center;
-            background: var(--navy); gap: 1rem;
-        }
-
-        .spin-lg {
-            width: 36px; height: 36px;
-            border: 3px solid rgba(201,168,76,0.15);
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .loader-text { font-size: 0.82rem; color: var(--muted); }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Iframe */
-        #sysIframe {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            border: none; display: none;
-        }
-
-        /* Overlay for mobile */
-        .overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); z-index: 50;
-        }
-
-        /* ─── RESPONSIVE ──────────────────────────────── */
-        @media (max-width: 768px) {
-            :root { --sidebar-w: 280px; }
-
-            .hdr-sub, .stat-chip { display: none; }
-            .hamburger { display: block; }
-            .user-chip { max-width: 90px; }
-
-            .sidebar {
-                position: fixed;
-                top: var(--header-h); left: 0;
-                height: calc(100vh - var(--header-h));
-                z-index: 60;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open { transform: translateX(0); }
-            .overlay { display: none; }
-            .overlay.active { display: block; }
-
-            .quick-grid { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TIS Portal — ระบบสารสนเทศ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+<style>
+:root {
+  --bg:        #07090f;
+  --surface:   #0e1117;
+  --card:      #141821;
+  --card2:     #1a1f2e;
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(99,179,237,0.35);
+  --blue:      #4f9cf9;
+  --blue-dim:  #1e3a5f;
+  --cyan:      #38bdf8;
+  --gold:      #f59e0b;
+  --gold-dim:  #78350f;
+  --green:     #34d399;
+  --purple:    #a78bfa;
+  --pink:      #f472b6;
+  --red:       #f87171;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --muted2:    #94a3b8;
+  --radius-sm: 10px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --sidebar-w: 300px;
+  --hdr-h:     60px;
+  --font-th:   'Noto Sans Thai', sans-serif;
+  --font-en:   'Rajdhani', sans-serif;
+  --ease:      cubic-bezier(.4,0,.2,1);
+  --spring:    cubic-bezier(.34,1.56,.64,1);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-th);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(79,156,249,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(167,139,250,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(56,189,248,0.03) 0%, transparent 70%);
+}
+
+/* ═══════════════════════ LOGIN ═══════════════════════ */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+
+.login-wrap {
+  width: 100%; max-width: 420px;
+  animation: fadeUp .5s var(--ease);
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Logo mark */
+.login-logo-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 2rem;
+}
+
+.login-hexagon {
+  position: relative;
+  width: 80px; height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.login-hexagon svg.hex-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+
+.login-hexagon .hex-label {
+  position: relative; z-index: 1;
+  font-family: var(--font-en);
+  font-size: 1.4rem; font-weight: 700;
+  color: #fff; letter-spacing: 1px;
+}
+
+.login-brand {
+  font-family: var(--font-en);
+  font-size: 1.1rem; font-weight: 600;
+  color: var(--muted2); letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.login-card {
+  background: rgba(20,24,33,0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2rem 1.75rem;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  position: relative; overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), var(--cyan), transparent);
+  opacity: 0.6;
+}
+
+.login-card h2 {
+  font-size: 1.35rem; font-weight: 600; color: #fff;
+  margin-bottom: 0.25rem; text-align: center;
+}
+
+.login-card .sub {
+  text-align: center; font-size: 0.78rem; color: var(--muted);
+  margin-bottom: 1.75rem; letter-spacing: 0.3px;
+}
+
+.field { margin-bottom: 1rem; }
+
+.field label {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.72rem; font-weight: 500; color: var(--muted2);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.45rem;
+}
+
+.field label i { font-size: 0.85rem; color: var(--blue); }
+
+.input-wrap { position: relative; }
+
+.input-wrap input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-th); font-size: 0.93rem;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  outline: none;
+}
+
+.input-wrap input::placeholder { color: var(--muted); font-size: 0.82rem; }
+
+.input-wrap input:focus {
+  border-color: var(--blue);
+  background: rgba(79,156,249,0.06);
+  box-shadow: 0 0 0 3px rgba(79,156,249,0.12);
+}
+
+.btn-login {
+  width: 100%; margin-top: 0.5rem;
+  background: linear-gradient(135deg, var(--blue), #6366f1);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-family: var(--font-th);
+  font-size: 0.95rem; font-weight: 600;
+  padding: 0.85rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  transition: opacity .2s, transform .15s;
+  box-shadow: 0 4px 24px rgba(79,156,249,0.3);
+  position: relative; overflow: hidden;
+}
+
+.btn-login::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+
+.btn-login:hover::before { opacity: 1; }
+.btn-login:active { transform: scale(0.98); }
+.btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.err-msg {
+  margin-top: 0.75rem;
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: var(--radius-sm);
+  color: #fca5a5; font-size: 0.82rem;
+  padding: 0.6rem 0.85rem;
+  display: none; align-items: center; gap: 0.4rem;
+}
+
+.spin-xs {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════ PORTAL ═══════════════════════ */
+#portalScreen {
+  display: none;
+  position: fixed; inset: 0; z-index: 100;
+  flex-direction: column;
+}
+
+/* HEADER */
+.hdr {
+  height: var(--hdr-h);
+  background: rgba(14,17,23,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  position: relative; z-index: 50;
+}
+
+.hdr-logo {
+  display: flex; align-items: center; gap: 0.65rem; flex-shrink: 0;
+}
+
+.logo-hex {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; flex-shrink: 0;
+}
+
+.logo-hex svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.logo-hex span {
+  position: relative; z-index: 1;
+  font-family: var(--font-en); font-size: 0.7rem; font-weight: 700;
+  color: #fff; letter-spacing: 0.5px;
+}
+
+.hdr-title {
+  display: flex; flex-direction: column;
+}
+
+.hdr-title strong {
+  font-family: var(--font-en); font-size: 1rem; font-weight: 700;
+  color: #fff; letter-spacing: 1px; line-height: 1.1;
+}
+
+.hdr-title small {
+  font-size: 0.62rem; color: var(--muted); letter-spacing: 0.5px;
+  line-height: 1; display: none;
+}
+
+@media (min-width: 480px) { .hdr-title small { display: block; } }
+
+.hdr-spacer { flex: 1; }
+
+.live-badge {
+  display: flex; align-items: center; gap: 0.35rem;
+  background: rgba(52,211,153,0.1);
+  border: 1px solid rgba(52,211,153,0.2);
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.68rem; color: var(--green);
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  background: var(--green); border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.5; transform:scale(0.8); }
+}
+
+.user-pill {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem 0.3rem 0.45rem;
+}
+
+.user-avatar {
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: #fff; font-weight: 700;
+}
+
+.user-pill span {
+  font-size: 0.78rem; color: var(--muted2);
+  max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.hdr-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted2);
+  padding: 0.45rem 0.7rem;
+  font-family: var(--font-th); font-size: 0.75rem;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 0.35rem;
+  transition: all .2s;
+  white-space: nowrap;
+}
+
+.hdr-btn:hover {
+  background: var(--card2); color: var(--text);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.hdr-btn i { font-size: 0.9rem; }
+
+.hamburger-btn {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted2); padding: 0.5rem;
+  cursor: pointer; display: none;
+  align-items: center; justify-content: center;
+  transition: all .2s;
+}
+
+.hamburger-btn:hover { background: var(--card2); color: var(--text); }
+.hamburger-btn i { font-size: 1rem; }
+
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex; }
+  .live-badge, .hdr-btn span { display: none; }
+}
+
+/* BODY */
+.portal-body {
+  display: flex;
+  height: calc(100vh - var(--hdr-h));
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── SIDEBAR ──────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: transform .3s var(--ease), width .3s var(--ease);
+  position: relative; z-index: 30;
+}
+
+.sidebar-top {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-box {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+  transition: border-color .2s, background .2s;
+}
+
+.search-box:focus-within {
+  border-color: var(--blue);
+  background: rgba(79,156,249,0.05);
+}
+
+.search-box i { font-size: 0.9rem; color: var(--muted); flex-shrink: 0; }
+
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-family: var(--font-th); font-size: 0.82rem;
+  width: 100%;
+}
+
+.search-box input::placeholder { color: var(--muted); }
+
+.sidebar-scroll {
+  flex: 1; overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0 1rem;
+}
+
+.sidebar-scroll::-webkit-scrollbar { width: 3px; }
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08); border-radius: 3px;
+}
+
+/* Category */
+.cat-group { margin-bottom: 0.25rem; }
+
+.cat-trigger {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer; user-select: none;
+  transition: background .15s;
+  border-radius: 0;
+  position: relative;
+}
+
+.cat-trigger:hover { background: rgba(255,255,255,0.03); }
+.cat-trigger.open { background: rgba(79,156,249,0.05); }
+
+.cat-icon-wrap {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform .2s var(--spring);
+}
+
+.cat-trigger:hover .cat-icon-wrap { transform: scale(1.08); }
+
+.cat-icon-wrap i { font-size: 1rem; }
+
+.cat-meta { flex: 1; min-width: 0; }
+.cat-name { font-size: 0.82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-sub  { font-size: 0.68rem; color: var(--muted); margin-top: 0.05rem; }
+
+.cat-chevron {
+  color: var(--muted); font-size: 0.7rem;
+  transition: transform .25s var(--ease);
+  flex-shrink: 0;
+}
+
+.cat-trigger.open .cat-chevron { transform: rotate(90deg); }
+
+.cat-count-badge {
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.65rem; color: var(--muted2);
+  flex-shrink: 0;
+}
+
+/* Items */
+.cat-items {
+  max-height: 0; overflow: hidden;
+  transition: max-height .35s var(--ease);
+}
+
+.cat-items.open { max-height: 1000px; }
+
+.sys-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.55rem 1rem 0.55rem 1.2rem;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  position: relative;
+}
+
+.sys-item::before {
+  content: '';
+  position: absolute; left: 0; top: 50%;
+  width: 2px; height: 0;
+  background: var(--blue);
+  transform: translateY(-50%);
+  transition: height .2s var(--ease);
+  border-radius: 2px;
+}
+
+.sys-item:hover::before { height: 60%; }
+.sys-item.active::before { height: 100%; }
+
+.sys-item:hover {
+  background: rgba(79,156,249,0.05);
+}
+
+.sys-item.active {
+  background: rgba(79,156,249,0.08);
+}
+
+.sys-item-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+  transition: transform .2s var(--spring);
+}
+
+.sys-item:hover .sys-item-icon, .sys-item.active .sys-item-icon { transform: scale(1.1); }
+
+.sys-info { flex: 1; min-width: 0; }
+.sys-name {
+  font-size: 0.78rem; color: var(--muted2); line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .15s;
+}
+
+.sys-item:hover .sys-name, .sys-item.active .sys-name { color: var(--text); }
+.sys-item.active .sys-name { color: var(--blue) !important; font-weight: 500; }
+
+.sys-tag {
+  font-size: 0.58rem; font-family: var(--font-en); font-weight: 600;
+  letter-spacing: 0.5px; color: var(--muted);
+  background: rgba(255,255,255,0.04);
+  border-radius: 4px; padding: 0.05rem 0.3rem;
+  display: inline-block; margin-top: 0.15rem;
+}
+
+.sys-item.active .sys-tag { color: var(--blue); background: rgba(79,156,249,0.12); }
+
+/* ─── MAIN ──────────────────────────────────── */
+.main-panel {
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-width: 0;
+}
+
+.content-bar {
+  background: rgba(14,17,23,0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.25rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.content-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 1rem;
+}
+
+.content-text { flex: 1; min-width: 0; }
+.content-title { font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.content-sub { font-size: 0.7rem; color: var(--muted); }
+
+.status-pill {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px; font-size: 0.68rem;
+  flex-shrink: 0;
+}
+
+.status-pill.ready {
+  background: rgba(52,211,153,0.1);
+  border: 1px solid rgba(52,211,153,0.2);
+  color: var(--green);
+}
+
+.status-pill.loading {
+  background: rgba(79,156,249,0.1);
+  border: 1px solid rgba(79,156,249,0.2);
+  color: var(--blue);
+}
+
+/* Content area */
+.content-area {
+  flex: 1; position: relative; overflow: hidden;
+}
+
+/* ─── WELCOME ───────────────────────────────── */
+.welcome-screen {
+  position: absolute; inset: 0;
+  overflow-y: auto;
+  padding: 2rem 1.5rem;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.welcome-screen::-webkit-scrollbar { width: 4px; }
+.welcome-screen::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+
+.welcome-hero {
+  text-align: center; max-width: 500px;
+  margin-bottom: 2.5rem;
+  animation: fadeUp .5s var(--ease) .1s both;
+}
+
+.hero-emblem {
+  width: 72px; height: 72px;
+  margin: 0 auto 1.25rem;
+  position: relative;
+}
+
+.hero-emblem svg { width: 100%; height: 100%; }
+
+.hero-ring {
+  position: absolute; inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  animation: spinSlow 8s linear infinite;
+}
+
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+
+.welcome-hero h1 {
+  font-family: var(--font-en);
+  font-size: 1.6rem; font-weight: 700;
+  color: #fff; letter-spacing: 1px; margin-bottom: 0.5rem;
+}
+
+.welcome-hero p {
+  font-size: 0.85rem; color: var(--muted); line-height: 1.7;
+}
+
+/* Quick access */
+.section-label {
+  font-size: 0.68rem; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 0.75rem; align-self: flex-start;
+  width: 100%; max-width: 640px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%; max-width: 640px;
+  margin-bottom: 2rem;
+  animation: fadeUp .5s var(--ease) .2s both;
+}
+
+@media (max-width: 480px) {
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.quick-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 0.85rem;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+
+.quick-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+
+.quick-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.quick-card:hover::before { opacity: 1; }
+.quick-card:active { transform: translateY(0) scale(0.98); }
+
+.qcard-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+}
+
+.qcard-name {
+  font-size: 0.76rem; font-weight: 500; color: var(--text); line-height: 1.3;
+}
+
+.qcard-arrow {
+  font-size: 0.65rem; color: var(--muted);
+  margin-top: auto;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem; width: 100%; max-width: 640px;
+  animation: fadeUp .5s var(--ease) .3s both;
+}
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem; text-align: center;
+}
+
+.stat-val {
+  font-family: var(--font-en);
+  font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-lbl { font-size: 0.7rem; color: var(--muted); }
+
+/* ─── LOADER ───────────────────────────────── */
+#pageLoader {
+  position: absolute; inset: 0;
+  background: var(--bg);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.25rem;
+}
+
+.loader-ring {
+  width: 48px; height: 48px; position: relative;
+}
+
+.loader-ring::before, .loader-ring::after {
+  content: ''; position: absolute; inset: 0;
+  border-radius: 50%; border: 3px solid transparent;
+}
+
+.loader-ring::before {
+  border-top-color: var(--blue);
+  animation: spin .8s linear infinite;
+}
+
+.loader-ring::after {
+  border-bottom-color: var(--purple);
+  animation: spin 1.2s linear infinite reverse;
+  inset: 6px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-txt {
+  font-size: 0.82rem; color: var(--muted);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100% { opacity:.5; } 50% { opacity:1; } }
+
+/* ─── IFRAME ───────────────────────────────── */
+#sysIframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: none; display: none;
+}
+
+/* ─── OVERLAY ──────────────────────────────── */
+.mob-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 20;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ─── MOBILE RESPONSIVE ────────────────────── */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 280px; }
+
+  .sidebar {
+    position: fixed;
+    top: var(--hdr-h); left: 0;
+    height: calc(100vh - var(--hdr-h));
+    transform: translateX(-100%);
+    z-index: 25;
+    box-shadow: 4px 0 40px rgba(0,0,0,0.4);
+  }
+
+  .sidebar.open { transform: translateX(0); }
+  .mob-overlay.active { display: block; }
+
+  .welcome-screen { padding: 1.25rem 1rem; }
+  .quick-grid { gap: 0.6rem; }
+  .quick-card { padding: 0.85rem 0.7rem; }
+  .stats-row { gap: 0.5rem; }
+  .stat-val { font-size: 1.3rem; }
+}
+
+/* ─── SEARCH HIGHLIGHT ─────────────────────── */
+.sys-item.search-hidden { display: none; }
+
+/* ─── UTILS ────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+</style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══════════════════════════════════ -->
+<!-- ═══════════ LOGIN ════════════════════════════════ -->
 <div id="loginScreen">
-    <div class="login-card">
-        <div class="login-emblem">TIS</div>
-        <h1>เข้าสู่ระบบ</h1>
-        <p class="sub">THAI IDENTITY SUGAR FACTORY — ระบบสารสนเทศภายใน</p>
-
-        <div class="field">
-            <label>รหัสพนักงาน</label>
-            <input type="text" id="userId" placeholder="เลขพนักงาน 4 ตัวท้าย" autocomplete="username">
-        </div>
-        <div class="field">
-            <label>รหัสผ่าน</label>
-            <input type="password" id="password" placeholder="เลข 3 ตัวท้ายบัตรประชาชน" autocomplete="current-password">
-        </div>
-        <button class="login-btn" id="loginBtn">เข้าสู่ระบบ</button>
-        <div class="err-box" id="errBox"></div>
+  <div class="login-wrap">
+    <div class="login-logo-wrap">
+      <div class="login-hexagon">
+        <svg class="hex-bg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="hexG" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4f9cf9"/>
+              <stop offset="100%" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+          <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#hexG)" opacity="0.2"/>
+          <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="none" stroke="url(#hexG)" stroke-width="1.5"/>
+        </svg>
+        <span class="hex-label">TIS</span>
+      </div>
+      <div class="login-brand">Information System</div>
     </div>
+
+    <div class="login-card">
+      <h2>เข้าสู่ระบบ</h2>
+      <p class="sub">Thai Identity Sugar Factory Co., Ltd. · KTIS Group</p>
+
+      <div class="field">
+        <label><i class="fi fi-rr-id-badge"></i> รหัสพนักงาน</label>
+        <div class="input-wrap">
+          <input type="text" id="userId" placeholder="เลขพนักงาน 4 ตัวท้าย" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="field">
+        <label><i class="fi fi-rr-lock"></i> รหัสผ่าน</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="เลข 3 ตัวท้ายบัตรประชาชน" autocomplete="current-password">
+        </div>
+      </div>
+
+      <button class="btn-login" id="loginBtn">
+        <i class="fi fi-rr-sign-in-alt"></i> เข้าสู่ระบบ
+      </button>
+
+      <div class="err-msg" id="errMsg">
+        <i class="fi fi-rr-exclamation"></i> <span id="errText"></span>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ═══ PORTAL ═══════════════════════════════════ -->
+<!-- ═══════════ PORTAL ════════════════════════════════ -->
 <div id="portalScreen">
 
-    <!-- HEADER -->
-    <header class="hdr">
-        <div class="hdr-left">
-            <button class="hamburger" id="hamburger">☰</button>
-            <div class="hdr-badge">TIS</div>
-            <div>
-                <div class="hdr-title">ระบบสารสนเทศ TIS</div>
-                <div class="hdr-sub">THAI IDENTITY SUGAR FACTORY COMPANY LIMITED</div>
-            </div>
-        </div>
-        <div class="hdr-right">
-            <div class="stat-chip">
-                <span class="stat-dot"></span>
-                ออนไลน์วันนี้ <strong id="todayUsers">—</strong>
-            </div>
-            <div class="user-chip" id="userName">ผู้ใช้งาน</div>
-            <button class="btn-ghost" onclick="logout()">ออกจากระบบ</button>
-        </div>
-    </header>
+  <!-- HEADER -->
+  <header class="hdr">
+    <button class="hamburger-btn" id="hamburger" onclick="toggleSidebar()">
+      <i class="fi fi-rr-menu-burger"></i>
+    </button>
 
-    <div class="portal-body">
-
-        <!-- SIDEBAR -->
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-lbl">เมนูระบบงาน</div>
-
-            <!-- 1. บันทึก & ตรวจสอบ -->
-            <div class="cat">
-                <div class="cat-hdr" onclick="toggleCat(this)">
-                    <div class="cat-left">
-                        <div class="cat-icon" style="background:rgba(52,152,219,0.15);">📋</div>
-                        <div>
-                            <div class="cat-name">บันทึก & ตรวจสอบคุณภาพ</div>
-                            <div class="cat-count">6 ระบบ</div>
-                        </div>
-                    </div>
-                    <span class="chevron-icon">▶</span>
-                </div>
-                <div class="cat-items">
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/checklist/','ระบบตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A</div>
-                            <span class="sys-tag">AI · SUGGEST</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Landid/','ระบบเพิ่ม ID แปลงอ้อยจากหน่วย')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">เพิ่ม ID แปลงอ้อยจากหน่วย</div>
-                            <span class="sys-tag">AUTO-SYNC</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/recheck/','ระบบตรวจมาตรฐาน QA-Engineering & Manager')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">ตรวจมาตรฐานการใช้งาน QA</div>
-                            <span class="sys-tag">ENGINEERING</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/tractor/','ระบบแจ้งข้อผิดพลาดภายในโรงงาน')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">แจ้งข้อผิดพลาดจุดงานในโรงงาน</div>
-                            <span class="sys-tag">TRACKING</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/E-doc/','ระบบบันทึกเลขหนังสือ อล. ภายใน')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">บันทึกเลขหนังสือ อล. ภายในโรงงาน</div>
-                            <span class="sys-tag">DOC</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/DachTissugar/','ระบบนำเข้าหนี้ตาย & หนี้ระงับ')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">นำเข้าหนี้ตาย & หนี้ระงับ</div>
-                            <span class="sys-tag">FINANCE</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. สลิปเงินเดือน -->
-            <div class="cat">
-                <div class="cat-hdr" onclick="toggleCat(this)">
-                    <div class="cat-left">
-                        <div class="cat-icon" style="background:rgba(46,204,113,0.15);">💰</div>
-                        <div>
-                            <div class="cat-name">ระบบสลิปเงินเดือน</div>
-                            <div class="cat-count">2 ระบบ</div>
-                        </div>
-                    </div>
-                    <span class="chevron-icon">▶</span>
-                </div>
-                <div class="cat-items">
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/emailslip/','ระบบแจ้ง Email ขอสลิปเงินเดือน')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">แจ้ง Email ขอสลิปเงินเดือน</div>
-                            <span class="sys-tag">EMAIL</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Tispayroll/','ระบบขอไฟล์สลิปย้อนหลัง OTP')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">ขอไฟล์สลิปย้อนหลัง</div>
-                            <span class="sys-tag">OTP · VERIFY</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. อนุมัติ & เอกสาร -->
-            <div class="cat">
-                <div class="cat-hdr" onclick="toggleCat(this)">
-                    <div class="cat-left">
-                        <div class="cat-icon" style="background:rgba(155,89,182,0.15);">📄</div>
-                        <div>
-                            <div class="cat-name">อนุมัติเอกสาร & จองห้องประชุม</div>
-                            <div class="cat-count">3 ระบบ</div>
-                        </div>
-                    </div>
-                    <span class="chevron-icon">▶</span>
-                </div>
-                <div class="cat-items">
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/signhubtis/','ระบบอนุมัติหนังสือ Online E-Signature')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">อนุมัติหนังสือ Online E-Signature</div>
-                            <span class="sys-tag">E-APPROVAL</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/tishome/','ระบบอัปโหลดไฟล์พร้อมสร้าง QR Code')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">อัปโหลดเอกสารประชุม + QR Code</div>
-                            <span class="sys-tag">QR · SHARE</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/tismeet/','ระบบจองห้องประชุม LINE Notification')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">จองห้องประชุม + LINE Notify</div>
-                            <span class="sys-tag">BOOKING</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Dashboard & AI -->
-            <div class="cat">
-                <div class="cat-hdr" onclick="toggleCat(this)">
-                    <div class="cat-left">
-                        <div class="cat-icon" style="background:rgba(231,76,60,0.15);">📊</div>
-                        <div>
-                            <div class="cat-name">Dashboard & วิเคราะห์ AI</div>
-                            <div class="cat-count">4 ระบบ</div>
-                        </div>
-                    </div>
-                    <span class="chevron-icon">▶</span>
-                </div>
-                <div class="cat-items">
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/PicRai/','ระบบอ้อยเข้า RealTime Scale & AutoMate')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">อ้อยเข้า RealTime — Scale & AutoMate</div>
-                            <span class="sys-tag">REALTIME</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Dashtis/','Dashboard Chemical-Lab TIS Sugar')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">Chemical-Lab ข้อมูลปีผลิตน้ำตาล</div>
-                            <span class="sys-tag">CHEM · LAB</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/sugartis/','AI-Agent คาดการณ์หยุดหีบอ้อย')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">AI คาดการณ์วันหยุดหีบอ้อย</div>
-                            <span class="sys-tag">AI · FORECAST</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/FiberTIS/','WatchDog รถใบอ้อย RealTime')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">WatchDog รถใบอ้อยแยกลาน RealTime</div>
-                            <span class="sys-tag">AI · SYNC</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. จัดการทั่วไป -->
-            <div class="cat">
-                <div class="cat-hdr" onclick="toggleCat(this)">
-                    <div class="cat-left">
-                        <div class="cat-icon" style="background:rgba(241,196,15,0.12);">⚙️</div>
-                        <div>
-                            <div class="cat-name">การจัดการทั่วไปภายใน</div>
-                            <div class="cat-count">5 ระบบ</div>
-                        </div>
-                    </div>
-                    <span class="chevron-icon">▶</span>
-                </div>
-                <div class="cat-items">
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Carcheck/','ระบบเช็คเข้า-ออก พนักงาน Online')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">เช็คเข้า-ออก พนักงาน Online</div>
-                            <span class="sys-tag">ANALYSIS</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/checkin/','ระบบเข้าออกงาน GPS Auto Online')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">ลงเวลาเข้างาน GPS Auto Online</div>
-                            <span class="sys-tag">GPS · BIO</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/Cartis/','ระบบจองรถในโรงงาน + วิเคราะห์ค่าใช้จ่าย')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">จองขอใช้รถโรงงาน + วิเคราะห์ค่าใช้จ่าย</div>
-                            <span class="sys-tag">FLEET</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/helptis/','ระบบแจ้งซ่อม IT — Ticket + AI Maintenance')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">แจ้งซ่อม IT — Ticket + AI Maintenance</div>
-                            <span class="sys-tag">HELPDESK</span>
-                        </div>
-                    </div>
-                    <div class="sys-item" onclick="loadSys('https://skywalker698.github.io/salesystem/','ระบบหน้าร้าน Tool องค์กร + AI Upload')">
-                        <span class="sys-dot"></span>
-                        <div class="sys-text">
-                            <div class="sys-name">หน้าร้าน Tool องค์กร + AI Upload</div>
-                            <span class="sys-tag">STORE</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-        <!-- MAIN -->
-        <main class="main">
-            <div class="main-hdr">
-                <div class="main-title" id="mainTitle">ยินดีต้อนรับสู่ระบบสารสนเทศ TIS</div>
-                <div class="main-sub" id="mainSub">เลือกระบบจากเมนูด้านซ้าย หรือกดการ์ดด้านล่างเพื่อเริ่มใช้งาน</div>
-            </div>
-
-            <div class="content-area">
-                <!-- Welcome -->
-                <div class="welcome" id="welcomeScreen">
-                    <div class="welcome-ring">🏭</div>
-                    <h2>TIS Information System Portal</h2>
-                    <p>ระบบรวมศูนย์การจัดการ โรงงานน้ำตาลไทยเอกลักษณ์<br>เลือกระบบที่ต้องการจากเมนู หรือกดปุ่มด่วนด้านล่าง</p>
-                    <div class="quick-grid" id="quickGrid"></div>
-                </div>
-
-                <!-- Loader -->
-                <div class="loader" id="loader">
-                    <div class="spin-lg"></div>
-                    <div class="loader-text">กำลังโหลดระบบ…</div>
-                </div>
-
-                <!-- Iframe -->
-                <iframe id="sysIframe" allowfullscreen></iframe>
-            </div>
-        </main>
+    <div class="hdr-logo">
+      <div class="logo-hex">
+        <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lhG" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4f9cf9"/>
+              <stop offset="100%" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10" fill="url(#lhG)" opacity="0.25"/>
+          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10" fill="none" stroke="url(#lhG)" stroke-width="1.2"/>
+        </svg>
+        <span>TIS</span>
+      </div>
+      <div class="hdr-title">
+        <strong class="gradient-text">TIS PORTAL</strong>
+        <small>Thai Identity Sugar Factory</small>
+      </div>
     </div>
+
+    <div class="hdr-spacer"></div>
+
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      ออนไลน์ <strong id="todayCount">—</strong>
+    </div>
+
+    <div class="user-pill">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <span id="userName">ผู้ใช้งาน</span>
+    </div>
+
+    <button class="hdr-btn" onclick="logout()">
+      <i class="fi fi-rr-sign-out-alt"></i> <span>ออกจากระบบ</span>
+    </button>
+  </header>
+
+  <!-- BODY -->
+  <div class="portal-body">
+    <div class="mob-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="search-box">
+          <i class="fi fi-rr-search"></i>
+          <input type="text" id="sideSearch" placeholder="ค้นหาระบบ..." oninput="doSearch(this.value)">
+        </div>
+      </div>
+
+      <div class="sidebar-scroll" id="sidebarScroll">
+
+        <!-- 1. บันทึก & ตรวจสอบ -->
+        <div class="cat-group" data-cat="check">
+          <div class="cat-trigger" onclick="toggleCat(this)">
+            <div class="cat-icon-wrap" style="background:rgba(56,189,248,0.12);">
+              <i class="fi fi-rr-clipboard-list-check" style="color:#38bdf8;"></i>
+            </div>
+            <div class="cat-meta">
+              <div class="cat-name">บันทึก & ตรวจสอบคุณภาพ</div>
+              <div class="cat-sub">Quality Control & Inspection</div>
+            </div>
+            <span class="cat-count-badge">6</span>
+            <i class="fi fi-rr-angle-right cat-chevron"></i>
+          </div>
+          <div class="cat-items">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/checklist/','ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A','fi fi-rr-settings','rgba(56,189,248,0.12)','#38bdf8','AI·SUGGEST')">
+              <div class="sys-item-icon" style="background:rgba(56,189,248,0.1);"><i class="fi fi-rr-settings" style="color:#38bdf8;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A</div>
+                <span class="sys-tag">AI · SUGGEST</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Landid/','เพิ่ม ID แปลงอ้อยจากหน่วย Auto-Sync','fi fi-rr-map-marker-plus','rgba(52,211,153,0.1)','#34d399','AUTO-SYNC')">
+              <div class="sys-item-icon" style="background:rgba(52,211,153,0.1);"><i class="fi fi-rr-map-marker-plus" style="color:#34d399;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">เพิ่ม ID แปลงอ้อยจากหน่วย Auto-Sync</div>
+                <span class="sys-tag">AUTO-SYNC</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/recheck/','ตรวจมาตรฐานการใช้งาน QA Engineering','fi fi-rr-shield-check','rgba(167,139,250,0.1)','#a78bfa','QA·ENG')">
+              <div class="sys-item-icon" style="background:rgba(167,139,250,0.1);"><i class="fi fi-rr-shield-check" style="color:#a78bfa;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">ตรวจมาตรฐานการใช้งาน QA Engineering</div>
+                <span class="sys-tag">QA · ENGINEERING</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tractor/','แจ้งข้อผิดพลาดจุดงานในโรงงาน','fi fi-rr-triangle-warning','rgba(248,113,113,0.1)','#f87171','ISSUE·TRACK')">
+              <div class="sys-item-icon" style="background:rgba(248,113,113,0.1);"><i class="fi fi-rr-triangle-warning" style="color:#f87171;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">แจ้งข้อผิดพลาดจุดงานในโรงงาน</div>
+                <span class="sys-tag">ISSUE · TRACK</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/E-doc/','บันทึกเลขหนังสือ อล. ภายในโรงงาน','fi fi-rr-file-edit','rgba(245,158,11,0.1)','#f59e0b','DOC')">
+              <div class="sys-item-icon" style="background:rgba(245,158,11,0.1);"><i class="fi fi-rr-file-edit" style="color:#f59e0b;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">บันทึกเลขหนังสือ อล. ภายในโรงงาน</div>
+                <span class="sys-tag">DOC · REGISTRY</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/DachTissugar/','นำเข้าหนี้ตาย & หนี้ระงับโรงงาน','fi fi-rr-coins','rgba(244,114,182,0.1)','#f472b6','FINANCE')">
+              <div class="sys-item-icon" style="background:rgba(244,114,182,0.1);"><i class="fi fi-rr-coins" style="color:#f472b6;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">นำเข้าหนี้ตาย & หนี้ระงับโรงงาน</div>
+                <span class="sys-tag">FINANCE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. สลิปเงินเดือน -->
+        <div class="cat-group" data-cat="payroll">
+          <div class="cat-trigger" onclick="toggleCat(this)">
+            <div class="cat-icon-wrap" style="background:rgba(52,211,153,0.12);">
+              <i class="fi fi-rr-wallet" style="color:#34d399;"></i>
+            </div>
+            <div class="cat-meta">
+              <div class="cat-name">ระบบสลิปเงินเดือน</div>
+              <div class="cat-sub">Payroll & Salary Slip</div>
+            </div>
+            <span class="cat-count-badge">2</span>
+            <i class="fi fi-rr-angle-right cat-chevron"></i>
+          </div>
+          <div class="cat-items">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/emailslip/','แจ้ง Email ขอสลิปเงินเดือน','fi fi-rr-envelope','rgba(52,211,153,0.1)','#34d399','EMAIL')">
+              <div class="sys-item-icon" style="background:rgba(52,211,153,0.1);"><i class="fi fi-rr-envelope" style="color:#34d399;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">แจ้ง Email ขอสลิปเงินเดือน</div>
+                <span class="sys-tag">EMAIL · REQUEST</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Tispayroll/','ขอไฟล์สลิปย้อนหลัง OTP Verify','fi fi-rr-file-invoice-dollar','rgba(245,158,11,0.1)','#f59e0b','OTP·VERIFY')">
+              <div class="sys-item-icon" style="background:rgba(245,158,11,0.1);"><i class="fi fi-rr-file-invoice-dollar" style="color:#f59e0b;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">ขอไฟล์สลิปย้อนหลัง OTP Verify</div>
+                <span class="sys-tag">OTP · VERIFY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. เอกสาร & ห้องประชุม -->
+        <div class="cat-group" data-cat="doc">
+          <div class="cat-trigger" onclick="toggleCat(this)">
+            <div class="cat-icon-wrap" style="background:rgba(167,139,250,0.12);">
+              <i class="fi fi-rr-document-signed" style="color:#a78bfa;"></i>
+            </div>
+            <div class="cat-meta">
+              <div class="cat-name">อนุมัติเอกสาร & ห้องประชุม</div>
+              <div class="cat-sub">e-Approval & Meeting Room</div>
+            </div>
+            <span class="cat-count-badge">3</span>
+            <i class="fi fi-rr-angle-right cat-chevron"></i>
+          </div>
+          <div class="cat-items">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/signhubtis/','อนุมัติหนังสือ Online E-Signature','fi fi-rr-pen-nib','rgba(167,139,250,0.1)','#a78bfa','E-SIGN')">
+              <div class="sys-item-icon" style="background:rgba(167,139,250,0.1);"><i class="fi fi-rr-pen-nib" style="color:#a78bfa;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">อนุมัติหนังสือ Online E-Signature</div>
+                <span class="sys-tag">E-APPROVAL</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tishome/','อัปโหลดเอกสารประชุม + QR Code','fi fi-rr-qrcode','rgba(56,189,248,0.1)','#38bdf8','QR·SHARE')">
+              <div class="sys-item-icon" style="background:rgba(56,189,248,0.1);"><i class="fi fi-rr-qrcode" style="color:#38bdf8;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">อัปโหลดเอกสารประชุม + สร้าง QR Code</div>
+                <span class="sys-tag">QR · SHARE</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tismeet/','จองห้องประชุม + LINE Notification','fi fi-rr-calendar-clock','rgba(52,211,153,0.1)','#34d399','BOOKING')">
+              <div class="sys-item-icon" style="background:rgba(52,211,153,0.1);"><i class="fi fi-rr-calendar-clock" style="color:#34d399;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">จองห้องประชุม + LINE Notification</div>
+                <span class="sys-tag">BOOKING · LINE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Dashboard & AI -->
+        <div class="cat-group" data-cat="dash">
+          <div class="cat-trigger" onclick="toggleCat(this)">
+            <div class="cat-icon-wrap" style="background:rgba(79,156,249,0.12);">
+              <i class="fi fi-rr-chart-mixed" style="color:#4f9cf9;"></i>
+            </div>
+            <div class="cat-meta">
+              <div class="cat-name">Dashboard & วิเคราะห์ AI</div>
+              <div class="cat-sub">Real-Time Analytics & AI</div>
+            </div>
+            <span class="cat-count-badge">4</span>
+            <i class="fi fi-rr-angle-right cat-chevron"></i>
+          </div>
+          <div class="cat-items">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/PicRai/','อ้อยเข้า RealTime Scale & AutoMate','fi fi-rr-leaf','rgba(52,211,153,0.1)','#34d399','REALTIME')">
+              <div class="sys-item-icon" style="background:rgba(52,211,153,0.1);"><i class="fi fi-rr-leaf" style="color:#34d399;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">อ้อยเข้า RealTime — Scale & AutoMate</div>
+                <span class="sys-tag">REAL-TIME</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Dashtis/','Chemical-Lab ข้อมูลปีผลิตน้ำตาล','fi fi-rr-flask','rgba(244,114,182,0.1)','#f472b6','CHEM·LAB')">
+              <div class="sys-item-icon" style="background:rgba(244,114,182,0.1);"><i class="fi fi-rr-flask" style="color:#f472b6;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">Chemical-Lab ข้อมูลปีผลิตน้ำตาล</div>
+                <span class="sys-tag">CHEM · LAB</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/sugartis/','AI คาดการณ์วันหยุดหีบอ้อย','fi fi-rr-brain','rgba(167,139,250,0.1)','#a78bfa','AI·FORECAST')">
+              <div class="sys-item-icon" style="background:rgba(167,139,250,0.1);"><i class="fi fi-rr-brain" style="color:#a78bfa;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">AI คาดการณ์วันหยุดหีบอ้อย</div>
+                <span class="sys-tag">AI · FORECAST</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/FiberTIS/','WatchDog รถใบอ้อยแยกลาน RealTime','fi fi-rr-eye','rgba(79,156,249,0.1)','#4f9cf9','WATCHDOG')">
+              <div class="sys-item-icon" style="background:rgba(79,156,249,0.1);"><i class="fi fi-rr-eye" style="color:#4f9cf9;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">WatchDog รถใบอ้อยแยกลาน RealTime</div>
+                <span class="sys-tag">AI · WATCHDOG</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. จัดการทั่วไป -->
+        <div class="cat-group" data-cat="mgmt">
+          <div class="cat-trigger" onclick="toggleCat(this)">
+            <div class="cat-icon-wrap" style="background:rgba(245,158,11,0.12);">
+              <i class="fi fi-rr-settings-sliders" style="color:#f59e0b;"></i>
+            </div>
+            <div class="cat-meta">
+              <div class="cat-name">การจัดการทั่วไปภายใน</div>
+              <div class="cat-sub">General Operations</div>
+            </div>
+            <span class="cat-count-badge">5</span>
+            <i class="fi fi-rr-angle-right cat-chevron"></i>
+          </div>
+          <div class="cat-items">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Carcheck/','เช็คเข้า-ออก พนักงาน Online Analysis','fi fi-rr-time-check','rgba(56,189,248,0.1)','#38bdf8','ATTENDANCE')">
+              <div class="sys-item-icon" style="background:rgba(56,189,248,0.1);"><i class="fi fi-rr-time-check" style="color:#38bdf8;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">เช็คเข้า-ออก พนักงาน Online</div>
+                <span class="sys-tag">ATTENDANCE</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/checkin/','ลงเวลาเข้างาน GPS Auto Real-Time','fi fi-rr-map-marker','rgba(52,211,153,0.1)','#34d399','GPS·AUTO')">
+              <div class="sys-item-icon" style="background:rgba(52,211,153,0.1);"><i class="fi fi-rr-map-marker" style="color:#34d399;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">ลงเวลาเข้างาน GPS Auto Real-Time</div>
+                <span class="sys-tag">GPS · BIO</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Cartis/','จองรถโรงงาน + วิเคราะห์ค่าใช้จ่าย','fi fi-rr-car-alt','rgba(245,158,11,0.1)','#f59e0b','FLEET')">
+              <div class="sys-item-icon" style="background:rgba(245,158,11,0.1);"><i class="fi fi-rr-car-alt" style="color:#f59e0b;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">จองรถโรงงาน + วิเคราะห์ค่าใช้จ่าย</div>
+                <span class="sys-tag">FLEET · COST</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/helptis/','แจ้งซ่อม IT — Ticket + AI Maintenance','fi fi-rr-computer','rgba(167,139,250,0.1)','#a78bfa','HELPDESK')">
+              <div class="sys-item-icon" style="background:rgba(167,139,250,0.1);"><i class="fi fi-rr-computer" style="color:#a78bfa;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">แจ้งซ่อม IT — Ticket + AI Maintenance</div>
+                <span class="sys-tag">HELPDESK · AI</span>
+              </div>
+            </div>
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/salesystem/','หน้าร้าน Tool องค์กร + AI Upload','fi fi-rr-shop','rgba(248,113,113,0.1)','#f87171','STORE')">
+              <div class="sys-item-icon" style="background:rgba(248,113,113,0.1);"><i class="fi fi-rr-shop" style="color:#f87171;"></i></div>
+              <div class="sys-info">
+                <div class="sys-name">หน้าร้าน Tool องค์กร + AI Upload</div>
+                <span class="sys-tag">STORE · AI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /sidebar-scroll -->
+    </nav>
+
+    <!-- MAIN PANEL -->
+    <div class="main-panel">
+      <div class="content-bar" id="contentBar">
+        <div class="content-icon" id="cIcon" style="background:rgba(79,156,249,0.1);">
+          <i class="fi fi-rr-home" style="color:#4f9cf9;"></i>
+        </div>
+        <div class="content-text">
+          <div class="content-title" id="cTitle">ระบบสารสนเทศ TIS Portal</div>
+          <div class="content-sub" id="cSub">เลือกระบบจากเมนูด้านซ้าย หรือกดการ์ดด่วนด้านล่าง</div>
+        </div>
+        <div class="status-pill ready" id="statusPill">
+          <i class="fi fi-rr-check"></i> พร้อมใช้งาน
+        </div>
+      </div>
+
+      <div class="content-area">
+
+        <!-- WELCOME -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-hero">
+            <div class="hero-emblem">
+              <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="hG" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4f9cf9" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0.3"/>
+                  </linearGradient>
+                </defs>
+                <polygon points="36,4 64,20 64,52 36,68 8,52 8,20" fill="url(#hG)"/>
+                <polygon points="36,4 64,20 64,52 36,68 8,52 8,20" fill="none" stroke="url(#hG)" stroke-width="2" opacity="0.6"/>
+                <text x="36" y="44" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="white">TIS</text>
+              </svg>
+              <div class="hero-ring"></div>
+            </div>
+            <h1 class="gradient-text">TIS PORTAL</h1>
+            <p>ระบบรวมศูนย์สารสนเทศ โรงงานน้ำตาลไทยเอกลักษณ์<br>Thai Identity Sugar Factory Co., Ltd. · KTIS Group</p>
+          </div>
+
+          <div class="section-label">⚡ ระบบที่ใช้บ่อย</div>
+          <div class="quick-grid" id="quickGrid"></div>
+
+          <div class="section-label" style="margin-top:0.5rem;">📊 ภาพรวมระบบ</div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-val" style="background:linear-gradient(135deg,#4f9cf9,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">20</div>
+              <div class="stat-lbl">ระบบทั้งหมด</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" style="background:linear-gradient(135deg,#34d399,#6ee7b7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="sysOnline">—</div>
+              <div class="stat-lbl">ออนไลน์วันนี้</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" style="background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">5</div>
+              <div class="stat-lbl">หมวดหมู่</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOADER -->
+        <div id="pageLoader">
+          <div class="loader-ring"></div>
+          <div class="loader-txt">กำลังโหลดระบบ…</div>
+        </div>
+
+        <!-- IFRAME -->
+        <iframe id="sysIframe" allowfullscreen></iframe>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-// ═══ CONFIG ════════════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec';
-const SHEET_ID = '1d9heXjqVSKvguPQM00KMErlLEjxzLq7xc3wLYx5Lp1I';
-const LOGIN_SHEET = 'Login';
+// ═══ CONFIG ═══════════════════════════════════
+const GAS_URL   = 'https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec';
+const SHEET_ID  = '1d9heXjqVSKvguPQM00KMErlLEjxzLq7xc3wLYx5Lp1I';
+const LOGIN_SH  = 'Login';
 
-// Quick-access systems shown on welcome screen
-const QUICK_SYSTEMS = [
-    { icon:'📈', name:'อ้อยเข้า RealTime', url:'https://skywalker698.github.io/PicRai/', title:'ระบบอ้อยเข้า RealTime' },
-    { icon:'🤖', name:'AI คาดการณ์หยุดหีบ', url:'https://skywalker698.github.io/sugartis/', title:'AI คาดการณ์หยุดหีบอ้อย' },
-    { icon:'📋', name:'แจ้งซ่อม IT', url:'https://skywalker698.github.io/helptis/', title:'แจ้งซ่อม IT Ticket' },
-    { icon:'📅', name:'จองห้องประชุม', url:'https://skywalker698.github.io/tismeet/', title:'จองห้องประชุม LINE Notify' },
-    { icon:'💰', name:'สลิปเงินเดือน', url:'https://skywalker698.github.io/Tispayroll/', title:'สลิปเงินเดือน OTP' },
-    { icon:'🚗', name:'จองขอใช้รถ', url:'https://skywalker698.github.io/Cartis/', title:'จองรถโรงงาน' },
+const QUICK = [
+  { icon:'fi fi-rr-leaf',   color:'#34d399', bg:'rgba(52,211,153,0.12)', name:'อ้อยเข้า RealTime',    url:'https://skywalker698.github.io/PicRai/',    title:'อ้อยเข้า RealTime — Scale & AutoMate' },
+  { icon:'fi fi-rr-brain',  color:'#a78bfa', bg:'rgba(167,139,250,0.12)',name:'AI คาดการณ์หยุดหีบ',  url:'https://skywalker698.github.io/sugartis/',  title:'AI คาดการณ์วันหยุดหีบอ้อย' },
+  { icon:'fi fi-rr-computer',color:'#a78bfa',bg:'rgba(167,139,250,0.12)',name:'แจ้งซ่อม IT',          url:'https://skywalker698.github.io/helptis/',   title:'แจ้งซ่อม IT — Ticket + AI Maintenance' },
+  { icon:'fi fi-rr-calendar-clock',color:'#34d399',bg:'rgba(52,211,153,0.12)',name:'จองห้องประชุม', url:'https://skywalker698.github.io/tismeet/',   title:'จองห้องประชุม + LINE Notification' },
+  { icon:'fi fi-rr-file-invoice-dollar',color:'#f59e0b',bg:'rgba(245,158,11,0.12)',name:'สลิปเงินเดือน',url:'https://skywalker698.github.io/Tispayroll/',title:'ขอไฟล์สลิปย้อนหลัง OTP Verify' },
+  { icon:'fi fi-rr-car-alt',color:'#f59e0b', bg:'rgba(245,158,11,0.12)', name:'จองรถโรงงาน',         url:'https://skywalker698.github.io/Cartis/',    title:'จองรถโรงงาน + วิเคราะห์ค่าใช้จ่าย' },
 ];
 
-// ═══ STATE ═════════════════════════════════════
-let currentUser = null;
-let activeItem = null;
-const sessionId = 'ses_' + Math.random().toString(36).slice(2,9) + '_' + Date.now();
-const startTime = Date.now();
+// ═══ STATE ════════════════════════════════════
+let me = null, activeItem = null;
+const sid = 'ses_' + Math.random().toString(36).slice(2,8) + '_' + Date.now();
+const t0 = Date.now();
 
-// ═══ LOGIN ═════════════════════════════════════
-async function doLogin() {
-    const userId = document.getElementById('userId').value.trim();
-    const pass   = document.getElementById('password').value.trim();
-    const btn    = document.getElementById('loginBtn');
-    const err    = document.getElementById('errBox');
-
-    err.style.display = 'none';
-    if (!userId || !pass) { showErr('กรุณากรอกข้อมูลให้ครบถ้วน'); return; }
-
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spin-sm"></div>กำลังตรวจสอบ…';
-
-    const result = await checkCredentials(userId, pass);
-
+// ═══ LOGIN ════════════════════════════════════
+function doLogin() {
+  const uid  = document.getElementById('userId').value.trim();
+  const pwd  = document.getElementById('password').value.trim();
+  const btn  = document.getElementById('loginBtn');
+  if (!uid || !pwd) return showErr('กรุณากรอกข้อมูลให้ครบถ้วน');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin-xs"></div> กำลังตรวจสอบ…';
+  checkCreds(uid, pwd).then(r => {
     btn.disabled = false;
-    btn.innerHTML = 'เข้าสู่ระบบ';
-
-    if (result.ok) {
-        currentUser = result.user;
-        trackAction('login', { userId: result.user.id });
-        showPortal();
-    } else {
-        showErr(result.msg);
-    }
+    btn.innerHTML = '<i class="fi fi-rr-sign-in-alt"></i> เข้าสู่ระบบ';
+    if (r.ok) { me = r.user; ping('login', { uid: r.user.id }); showPortal(); }
+    else showErr(r.msg);
+  });
 }
 
 function showErr(msg) {
-    const e = document.getElementById('errBox');
-    e.textContent = msg; e.style.display = 'block';
-    setTimeout(() => e.style.display = 'none', 5000);
+  const e = document.getElementById('errMsg');
+  document.getElementById('errText').textContent = msg;
+  e.style.display = 'flex';
+  setTimeout(() => e.style.display = 'none', 5000);
 }
 
-function checkCredentials(userId, pass) {
-    return new Promise(resolve => {
-        const ns = window.google = window.google || {};
-        ns.visualization = ns.visualization || {};
-        ns.visualization.Query = ns.visualization.Query || {};
-
-        const prev = ns.visualization.Query.setResponse;
-        let script;
-
-        const cleanup = () => {
-            ns.visualization.Query.setResponse = prev;
-            if (script && document.head.contains(script)) document.head.removeChild(script);
-        };
-
-        const timer = setTimeout(() => {
-            cleanup();
-            resolve({ ok: false, msg: 'การเชื่อมต่อหมดเวลา กรุณาลองใหม่' });
-        }, 12000);
-
-        ns.visualization.Query.setResponse = data => {
-            clearTimeout(timer);
-            try {
-                const rows = data?.table?.rows || [];
-                for (const row of rows) {
-                    if (!row.c || row.c.length < 3) continue;
-                    const id   = row.c[0]?.v?.toString().trim() || '';
-                    const pw   = row.c[1]?.v?.toString().trim() || '';
-                    const name = row.c[2]?.v?.toString().trim() || '';
-                    if (id === 'ID' || !id || !pw) continue;
-                    if (id === userId && pw === pass) {
-                        cleanup();
-                        return resolve({ ok: true, user: { id, name } });
-                    }
-                }
-                cleanup();
-                resolve({ ok: false, msg: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
-            } catch {
-                cleanup();
-                resolve({ ok: false, msg: 'เกิดข้อผิดพลาดในการตรวจสอบ' });
-            }
-        };
-
-        script = document.createElement('script');
-        script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${LOGIN_SHEET}`;
-        script.onerror = () => { clearTimeout(timer); cleanup(); resolve({ ok: false, msg: 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้' }); };
-        document.head.appendChild(script);
-    });
+function checkCreds(uid, pwd) {
+  return new Promise(res => {
+    const ns = (window.google = window.google||{});
+    ns.visualization = ns.visualization||{};
+    ns.visualization.Query = ns.visualization.Query||{};
+    const prev = ns.visualization.Query.setResponse;
+    let sc;
+    const done = () => {
+      ns.visualization.Query.setResponse = prev;
+      if (sc && sc.parentNode) sc.parentNode.removeChild(sc);
+    };
+    const timer = setTimeout(() => { done(); res({ ok:false, msg:'การเชื่อมต่อหมดเวลา' }); }, 12000);
+    ns.visualization.Query.setResponse = data => {
+      clearTimeout(timer);
+      try {
+        for (const row of data?.table?.rows || []) {
+          if (!row.c || row.c.length < 3) continue;
+          const id=row.c[0]?.v?.toString().trim()||'', pw=row.c[1]?.v?.toString().trim()||'', nm=row.c[2]?.v?.toString().trim()||'';
+          if (!id || id==='ID') continue;
+          if (id===uid && pw===pwd) { done(); return res({ ok:true, user:{id, name:nm} }); }
+        }
+        done(); res({ ok:false, msg:'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+      } catch { done(); res({ ok:false, msg:'เกิดข้อผิดพลาดในการตรวจสอบ' }); }
+    };
+    sc = document.createElement('script');
+    sc.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${LOGIN_SH}`;
+    sc.onerror = () => { clearTimeout(timer); done(); res({ ok:false, msg:'ไม่สามารถเชื่อมต่อฐานข้อมูลได้' }); };
+    document.head.appendChild(sc);
+  });
 }
 
-// ═══ PORTAL ════════════════════════════════════
+// ═══ PORTAL ═══════════════════════════════════
 function showPortal() {
-    document.getElementById('loginScreen').style.display = 'none';
-    const p = document.getElementById('portalScreen');
-    p.style.display = 'flex';
-    document.getElementById('userName').textContent = currentUser.name || currentUser.id;
-    buildQuickGrid();
-    getStats();
-    setInterval(getStats, 5 * 60 * 1000);
-    // Auto-open first category
-    const firstHdr = document.querySelector('.cat-hdr');
-    if (firstHdr) toggleCat(firstHdr);
+  document.getElementById('loginScreen').style.display = 'none';
+  const p = document.getElementById('portalScreen');
+  p.style.display = 'flex';
+  const nm = me.name || me.id;
+  document.getElementById('userName').textContent = nm;
+  document.getElementById('userAvatar').textContent = nm.charAt(0).toUpperCase();
+  buildQuick();
+  loadStats();
+  setInterval(loadStats, 5*60*1000);
+  // Auto-open Dashboard cat
+  const cats = document.querySelectorAll('.cat-trigger');
+  cats.forEach(c => { if (c.closest('.cat-group').dataset.cat === 'dash') toggleCat(c); });
 }
 
-function buildQuickGrid() {
-    const grid = document.getElementById('quickGrid');
-    grid.innerHTML = QUICK_SYSTEMS.map(s =>
-        `<div class="quick-card" onclick="loadSys('${s.url}','${s.title}')">
-            <div class="qc-icon">${s.icon}</div>
-            <div class="qc-name">${s.name}</div>
-        </div>`
-    ).join('');
+function buildQuick() {
+  document.getElementById('quickGrid').innerHTML = QUICK.map(s =>
+    `<div class="quick-card" onclick="loadSysByQuick('${s.url}','${s.title}','${s.icon}','${s.bg}','${s.color}')">
+      <div class="qcard-icon" style="background:${s.bg};"><i class="${s.icon}" style="color:${s.color};font-size:1.1rem;"></i></div>
+      <div class="qcard-name">${s.name}</div>
+      <div class="qcard-arrow"><i class="fi fi-rr-arrow-right"></i></div>
+    </div>`
+  ).join('');
 }
 
 function logout() {
-    if (!confirm('ต้องการออกจากระบบหรือไม่?')) return;
-    currentUser = null; activeItem = null;
-    document.getElementById('portalScreen').style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('userId').value = '';
-    document.getElementById('password').value = '';
-    document.getElementById('sysIframe').src = '';
-    resetContent();
-    // Reset all cats
-    document.querySelectorAll('.cat-hdr').forEach(h => h.classList.remove('open'));
-    document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
+  if (!confirm('ต้องการออกจากระบบหรือไม่?')) return;
+  me = null; activeItem = null;
+  document.getElementById('portalScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('userId').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('sysIframe').src = '';
+  resetContent();
+  document.querySelectorAll('.cat-trigger').forEach(t => t.classList.remove('open'));
+  document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
+  document.querySelectorAll('.sys-item').forEach(i => i.classList.remove('active'));
 }
 
 function resetContent() {
-    document.getElementById('welcomeScreen').style.display = 'flex';
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('sysIframe').style.display = 'none';
-    document.getElementById('mainTitle').textContent = 'ยินดีต้อนรับสู่ระบบสารสนเทศ TIS';
-    document.getElementById('mainSub').textContent = 'เลือกระบบจากเมนู หรือกดการ์ดด่วนด้านล่าง';
+  document.getElementById('welcomeScreen').style.display = 'flex';
+  document.getElementById('pageLoader').style.display = 'none';
+  document.getElementById('sysIframe').style.display = 'none';
+  document.getElementById('cTitle').textContent = 'ระบบสารสนเทศ TIS Portal';
+  document.getElementById('cSub').textContent = 'เลือกระบบจากเมนูด้านซ้าย หรือกดการ์ดด่วน';
+  setStatus('ready');
 }
 
-// ═══ NAVIGATION ════════════════════════════════
-function toggleCat(hdr) {
-    const isOpen = hdr.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.cat-hdr').forEach(h => h.classList.remove('open'));
-    document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
-    if (!isOpen) {
-        hdr.classList.add('open');
-        hdr.nextElementSibling.classList.add('open');
+// ═══ LOAD SYSTEM ══════════════════════════════
+function loadSys(el, url, title, iconCls, iconBg, iconColor, tag) {
+  if (activeItem) activeItem.classList.remove('active');
+  el.classList.add('active');
+  activeItem = el;
+  _openSys(url, title, iconCls, iconBg, iconColor);
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+function loadSysByQuick(url, title, iconCls, iconBg, iconColor) {
+  // find matching sidebar item
+  const items = document.querySelectorAll('.sys-item');
+  if (activeItem) activeItem.classList.remove('active');
+  for (const it of items) {
+    if (it.getAttribute('onclick')?.includes(url)) {
+      it.classList.add('active');
+      activeItem = it;
+      break;
     }
+  }
+  _openSys(url, title, iconCls, iconBg, iconColor);
 }
 
-function loadSys(url, title) {
-    // Update active menu item
-    if (activeItem) activeItem.classList.remove('active');
-    const items = document.querySelectorAll('.sys-item');
-    for (const item of items) {
-        if (item.getAttribute('onclick')?.includes(url)) {
-            item.classList.add('active');
-            activeItem = item;
-            break;
-        }
-    }
+function _openSys(url, title, iconCls, iconBg, iconColor) {
+  const cIcon = document.getElementById('cIcon');
+  cIcon.style.background = iconBg || 'rgba(79,156,249,0.1)';
+  cIcon.innerHTML = `<i class="${iconCls}" style="color:${iconColor||'#4f9cf9'};"></i>`;
+  document.getElementById('cTitle').textContent = title;
+  document.getElementById('cSub').textContent = url.replace('https://','');
+  setStatus('loading');
 
-    document.getElementById('mainTitle').textContent = title;
-    document.getElementById('mainSub').textContent = 'กำลังโหลดระบบ…';
-    document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('loader').style.display = 'flex';
-    document.getElementById('sysIframe').style.display = 'none';
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('sysIframe').style.display = 'none';
+  document.getElementById('pageLoader').style.display = 'flex';
 
-    trackAction('open_system', { url, title });
+  ping('open', { url, title });
 
-    const iframe = document.getElementById('sysIframe');
-    iframe.src = 'about:blank';
-    setTimeout(() => { iframe.src = url; }, 80);
+  const iframe = document.getElementById('sysIframe');
+  iframe.src = 'about:blank';
+  setTimeout(() => { iframe.src = url; }, 80);
 
-    iframe.onload = () => {
-        if (iframe.src === 'about:blank') return;
-        document.getElementById('loader').style.display = 'none';
-        iframe.style.display = 'block';
-        document.getElementById('mainSub').textContent = 'ระบบพร้อมใช้งาน';
-    };
-    iframe.onerror = () => {
-        document.getElementById('loader').style.display = 'none';
-        resetContent();
-        document.getElementById('mainSub').textContent = 'เกิดข้อผิดพลาดในการโหลด';
-    };
-
-    // Close sidebar on mobile
-    if (window.innerWidth <= 768) closeSidebar();
+  iframe.onload = () => {
+    if (iframe.src === 'about:blank') return;
+    document.getElementById('pageLoader').style.display = 'none';
+    iframe.style.display = 'block';
+    setStatus('ready');
+    document.getElementById('cSub').textContent = 'ระบบพร้อมใช้งาน';
+  };
+  iframe.onerror = () => {
+    document.getElementById('pageLoader').style.display = 'none';
+    resetContent();
+  };
 }
 
-// ═══ SIDEBAR MOBILE ════════════════════════════
+function setStatus(s) {
+  const pill = document.getElementById('statusPill');
+  if (s === 'ready') {
+    pill.className = 'status-pill ready';
+    pill.innerHTML = '<i class="fi fi-rr-check"></i> พร้อมใช้งาน';
+  } else {
+    pill.className = 'status-pill loading';
+    pill.innerHTML = '<i class="fi fi-rr-loading" style="animation:spin .8s linear infinite;display:inline-block;"></i> กำลังโหลด…';
+  }
+}
+
+// ═══ SIDEBAR ══════════════════════════════════
+function toggleCat(trigger) {
+  const isOpen = trigger.classList.contains('open');
+  document.querySelectorAll('.cat-trigger').forEach(t => t.classList.remove('open'));
+  document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
+  if (!isOpen) {
+    trigger.classList.add('open');
+    trigger.nextElementSibling.classList.add('open');
+  }
+}
+
 function toggleSidebar() {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('overlay');
-    if (sb.classList.contains('open')) {
-        sb.classList.remove('open'); ov.classList.remove('active');
-    } else {
-        sb.classList.add('open'); ov.classList.add('active');
-    }
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open', !isOpen);
+  ov.classList.toggle('active', !isOpen);
 }
 
 function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('active');
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
 }
 
-// ═══ ANALYTICS ═════════════════════════════════
-function trackAction(action, extra = {}) {
-    try {
-        fetch(GAS_URL, {
-            method: 'POST', mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, sessionId, userId: currentUser?.id, ts: new Date().toISOString(), ...extra })
-        });
-    } catch {}
+// ═══ SEARCH ═══════════════════════════════════
+function doSearch(q) {
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('.sys-item').forEach(item => {
+    const txt = item.querySelector('.sys-name').textContent.toLowerCase();
+    item.classList.toggle('search-hidden', q.length > 0 && !txt.includes(q));
+  });
+  if (q.length > 0) {
+    // open all cats that have visible items
+    document.querySelectorAll('.cat-group').forEach(group => {
+      const visible = [...group.querySelectorAll('.sys-item')].some(i => !i.classList.contains('search-hidden'));
+      group.querySelector('.cat-trigger').classList.toggle('open', visible);
+      group.querySelector('.cat-items').classList.toggle('open', visible);
+    });
+  }
 }
 
-async function getStats() {
-    try {
-        const r = await fetch(GAS_URL + '?action=stats');
-        const d = await r.json();
-        document.getElementById('todayUsers').textContent = d.todayUsers ?? '—';
-    } catch {}
+// ═══ ANALYTICS ════════════════════════════════
+function ping(action, extra={}) {
+  try {
+    fetch(GAS_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ action, sid, uid:me?.id, ts:new Date().toISOString(), ...extra })
+    });
+  } catch {}
 }
 
-// ═══ EVENTS ════════════════════════════════════
+async function loadStats() {
+  try {
+    const r = await fetch(GAS_URL + '?action=stats');
+    const d = await r.json();
+    const n = d.todayUsers ?? '—';
+    document.getElementById('todayCount').textContent = n;
+    document.getElementById('sysOnline').textContent = n;
+  } catch {}
+}
+
+// ═══ EVENTS ═══════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('loginBtn').addEventListener('click', doLogin);
-    document.getElementById('userId').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password').focus(); });
-    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-    document.getElementById('hamburger').addEventListener('click', toggleSidebar);
+  document.getElementById('loginBtn').onclick = doLogin;
+  document.getElementById('userId').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('password').focus(); });
+  document.getElementById('password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 });
 
 window.addEventListener('beforeunload', () => {
-    const dur = Math.floor((Date.now() - startTime) / 1000);
-    navigator.sendBeacon?.(GAS_URL, JSON.stringify({ action: 'session_end', sessionId, userId: currentUser?.id, dur }));
+  navigator.sendBeacon?.(GAS_URL, JSON.stringify({ action:'end', sid, uid:me?.id, dur:Math.floor((Date.now()-t0)/1000) }));
 });
 </script>
 </body>
