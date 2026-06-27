@@ -120,6 +120,10 @@ body::after {
   0%   { stroke-dashoffset: 200 }
   100% { stroke-dashoffset: 0 }
 }
+@keyframes sparkle-twinkle {
+  0%,100% { opacity:.55; transform:scale(0.92); }
+  50%     { opacity:1;   transform:scale(1.08); }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    LOGIN SCREEN
@@ -612,11 +616,11 @@ body::after {
   transition:max-height .35s var(--ease);
   background:rgba(0,0,0,0.15);
 }
-.cat-items.open { max-height:1200px; }
+.cat-items.open { max-height:2200px; }
 
 .sys-item {
-  display:flex; align-items:center; gap:0.65rem;
-  padding:0.52rem 0.85rem 0.52rem 1.1rem;
+  display:flex; align-items:flex-start; gap:0.65rem;
+  padding:0.56rem 0.85rem 0.56rem 1.1rem;
   cursor:pointer;
   transition:all var(--dur);
   position:relative;
@@ -633,7 +637,7 @@ body::after {
   border-radius:2px;
 }
 
-.sys-item:hover::before { height:65%; }
+.sys-item:hover::before { height:70%; }
 .sys-item.active::before { height:100%; }
 
 .sys-item:hover { background:rgba(232,168,32,0.04); }
@@ -643,6 +647,7 @@ body::after {
   width:28px; height:28px; border-radius:7px;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0; font-size:0.88rem;
+  margin-top:0.05rem;
   transition:transform .2s var(--spring);
 }
 .sys-item:hover .sys-item-icon, .sys-item.active .sys-item-icon { transform:scale(1.12); }
@@ -657,12 +662,34 @@ body::after {
 .sys-item:hover .sys-name { color:var(--text); }
 .sys-item.active .sys-name { color:var(--gold-bright) !important; font-weight:600; }
 
+/* Codename style — used when the item has an English product codename
+   (sourced from namesys.txt) so the list reads like a clean product catalogue */
+.sys-name.codename {
+  font-family: var(--font-en);
+  font-weight:700;
+  letter-spacing:0.4px;
+  font-size:0.76rem;
+}
+
+/* Subtitle line — short English description under the codename */
+.sys-desc {
+  font-family: var(--font-mono);
+  font-size:0.6rem;
+  color: var(--muted);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-top:0.1rem;
+  letter-spacing:0.2px;
+  transition:color var(--dur);
+}
+.sys-item:hover .sys-desc,
+.sys-item.active .sys-desc { color:var(--muted2); }
+
 .sys-tag {
   font-size:0.56rem; font-family:var(--font-mono); font-weight:700;
   letter-spacing:0.5px; color:var(--muted);
   background:rgba(255,255,255,0.04);
   border-radius:3px; padding:0.04rem 0.3rem;
-  display:inline-block; margin-top:0.12rem;
+  display:inline-block; margin-top:0.18rem;
   border:1px solid transparent;
   transition:all var(--dur);
 }
@@ -670,6 +697,21 @@ body::after {
   color:var(--gold);
   background:rgba(232,168,32,0.1);
   border-color:rgba(232,168,32,0.2);
+}
+
+/* AI-capability tag — cyan accent + tiny sparkle so AI-assisted systems
+   are recognisable at a glance, consistent across the whole sidebar */
+.sys-tag.ai-tag {
+  display:inline-flex; align-items:center; gap:0.22rem;
+  color:var(--cyan);
+  background:rgba(56,182,255,0.1);
+  border-color:rgba(56,182,255,0.22);
+}
+.sys-tag.ai-tag i { font-size:0.52rem; animation:sparkle-twinkle 2.4s ease-in-out infinite; }
+.sys-item.active .sys-tag.ai-tag {
+  color:var(--electric);
+  background:rgba(0,229,255,0.12);
+  border-color:rgba(0,229,255,0.3);
 }
 
 /* ── MAIN PANEL ─────────────────────────────────────────────────────────── */
@@ -704,6 +746,7 @@ body::after {
 .content-sub {
   font-size:0.65rem; color:var(--muted);
   font-family:var(--font-mono);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
 .status-pill {
@@ -885,7 +928,7 @@ body::after {
   cursor:pointer;
   transition:all .2s var(--ease);
   position:relative; overflow:hidden;
-  display:flex; flex-direction:column; gap:0.55rem;
+  display:flex; flex-direction:column; gap:0.4rem;
 }
 
 /* Top shimmer line */
@@ -911,11 +954,20 @@ body::after {
 }
 
 .qcard-name {
-  font-size:0.75rem; font-weight:600; color:var(--text2);
+  font-family:var(--font-en);
+  font-size:0.74rem; font-weight:700; color:var(--text2);
+  letter-spacing:0.3px;
   line-height:1.3;
   transition:color var(--dur);
 }
 .quick-card:hover .qcard-name { color:var(--text); }
+
+.qcard-desc {
+  font-family:var(--font-mono);
+  font-size:0.6rem; color:var(--muted);
+  line-height:1.3;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 
 .qcard-arrow {
   font-size:0.62rem; color:var(--muted);
@@ -1205,65 +1257,72 @@ body::after {
               <div class="cat-name">บันทึก & ตรวจสอบคุณภาพ</div>
               <div class="cat-sub">Quality Control & Inspection</div>
             </div>
-            <span class="cat-count-badge">7</span>
+            <span class="cat-count-badge">8</span>
             <i class="fi fi-rr-angle-right cat-chevron"></i>
           </div>
           <div class="cat-items">
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/checklist/','ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A','fi fi-rr-settings','rgba(56,182,255,0.12)','#38b6ff','AI·SUGGEST')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/checklist/','HarvestIQ — Parts Performance Monitor','ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A พร้อม AI Suggest','fi fi-rr-settings','rgba(56,182,255,0.12)','#38b6ff','AI · SUGGEST')">
               <div class="sys-item-icon" style="background:rgba(56,182,255,0.1);"><i class="fi fi-rr-settings" style="color:#38b6ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">ตรวจสมรรถนะอะไหล่ฤดูหีบ Type-A</div>
-                <span class="sys-tag">AI · SUGGEST</span>
+                <div class="sys-name codename">HarvestIQ</div>
+                <div class="sys-desc">Parts Performance Monitor</div>
+                <span class="sys-tag ai-tag"><i class="fi fi-rr-sparkles"></i>AI · SUGGEST</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Landid/','เพิ่ม ID แปลงอ้อยจากหน่วย Auto-Sync','fi fi-rr-map-marker-plus','rgba(45,212,160,0.1)','#2dd4a0','AUTO-SYNC')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Landid/','SyncCane — Cane Conversion ID Registry','เพิ่ม ID แปลงอ้อยจากหน่วย Auto-Sync','fi fi-rr-map-marker-plus','rgba(45,212,160,0.1)','#2dd4a0','AUTO-SYNC')">
               <div class="sys-item-icon" style="background:rgba(45,212,160,0.1);"><i class="fi fi-rr-map-marker-plus" style="color:#2dd4a0;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">เพิ่ม ID แปลงอ้อยจากหน่วย Auto-Sync</div>
+                <div class="sys-name codename">SyncCane</div>
+                <div class="sys-desc">Cane Conversion ID Registry</div>
                 <span class="sys-tag">AUTO-SYNC</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/recheck/','ตรวจมาตรฐานการใช้งาน QA Engineering','fi fi-rr-shield-check','rgba(157,114,255,0.1)','#9d72ff','QA·ENG')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/recheck/','QAForge — Engineering & Ops Standards','ตรวจมาตรฐานการใช้งานเครื่องจักร ผ่าน QA ภายใน','fi fi-rr-shield-check','rgba(157,114,255,0.1)','#9d72ff','QA · ENG')">
               <div class="sys-item-icon" style="background:rgba(157,114,255,0.1);"><i class="fi fi-rr-shield-check" style="color:#9d72ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">ตรวจมาตรฐานการใช้งาน QA Engineering</div>
+                <div class="sys-name codename">QAForge</div>
+                <div class="sys-desc">Engineering & Ops Standards</div>
                 <span class="sys-tag">QA · ENGINEERING</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tractor/','แจ้งข้อผิดพลาดจุดงานในโรงงาน','fi fi-rr-triangle-warning','rgba(255,107,107,0.1)','#ff6b6b','ISSUE·TRACK')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tractor/','FaultTrack — Plant Incident & Root Cause','แจ้งข้อผิดพลาดจุดงานในโรงงาน','fi fi-rr-triangle-warning','rgba(255,107,107,0.1)','#ff6b6b','ISSUE · TRACK')">
               <div class="sys-item-icon" style="background:rgba(255,107,107,0.1);"><i class="fi fi-rr-triangle-warning" style="color:#ff6b6b;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">แจ้งข้อผิดพลาดจุดงานในโรงงาน</div>
+                <div class="sys-name codename">FaultTrack</div>
+                <div class="sys-desc">Plant Incident & Root Cause</div>
                 <span class="sys-tag">ISSUE · TRACK</span>
               </div>
             </div>
-        
-             <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/internalbook/','บันทึกหนังสือภายใน SugarTIS','fi fi-rr-file-edit','rgba(232,168,32,0.1)','#e8a820','DOC')">
+
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/internalbook/','บันทึกหนังสือภายใน SugarTIS','จัดเก็บเอกสาร หนังสือภายในองค์กร SugarTIS','fi fi-rr-file-edit','rgba(232,168,32,0.1)','#e8a820','DOC · REGISTRY')">
               <div class="sys-item-icon" style="background:rgba(232,168,32,0.1);"><i class="fi fi-rr-file-edit" style="color:#e8a820;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">ระบบจัดเก็บเอกสาร หนังสือภายในองค์กร SugarTIS</div>
+                <div class="sys-name">บันทึกหนังสือภายใน SugarTIS</div>
                 <span class="sys-tag">DOC · REGISTRY</span>
               </div>
             </div>
-                <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/E-doc/','บันทึกเลขหนังสือ อล. ภายในโรงงาน','fi fi-rr-file-edit','rgba(232,168,32,0.1)','#e8a820','DOC')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/E-doc/','DocLog — Internal Document Registry','จัดเก็บประวัติ อล. ไทยเอกลักษณ์ จำกัด','fi fi-rr-file-edit','rgba(232,168,32,0.1)','#e8a820','DOC · REGISTRY')">
               <div class="sys-item-icon" style="background:rgba(232,168,32,0.1);"><i class="fi fi-rr-file-edit" style="color:#e8a820;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">ระบบจัดเก็บประวัติ อล ไทยเอกลักษณ์ จำกัด</div>
-                <span class="sys-tag">E-Book · InternalSugar</span>
+                <div class="sys-name codename">DocLog</div>
+                <div class="sys-desc">Internal Document Registry</div>
+                <span class="sys-tag">DOC · REGISTRY</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/DachTissugar/','นำเข้าหนี้ตาย & หนี้ระงับโรงงาน','fi fi-rr-coins','rgba(240,98,146,0.1)','#f06292','FINANCE')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/DachTissugar/','DebtLedger — NPL & Suspended Debt Import','นำเข้าหนี้ตาย & หนี้ระงับโรงงาน','fi fi-rr-coins','rgba(240,98,146,0.1)','#f06292','FINANCE')">
               <div class="sys-item-icon" style="background:rgba(240,98,146,0.1);"><i class="fi fi-rr-coins" style="color:#f06292;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">นำเข้าหนี้ตาย & หนี้ระงับโรงงาน</div>
+                <div class="sys-name codename">DebtLedger</div>
+                <div class="sys-desc">NPL & Suspended Debt Import</div>
                 <span class="sys-tag">FINANCE</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/subsin/','หลักทรัพย์ & Report','fi fi-rr-coins','rgba(240,98,146,0.1)','#f06292','Finance&Report')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/subsin/','FarmerAsset — Security & Farmer Report Portal','หลักทรัพย์ & รายงานชาวไร่น้ำตาลไทยเอกลักษณ์','fi fi-rr-coins','rgba(240,98,146,0.1)','#f06292','FINANCE & REPORT')">
               <div class="sys-item-icon" style="background:rgba(240,98,146,0.1);"><i class="fi fi-rr-coins" style="color:#f06292;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">หลักทรัพย์ & Report ชาวไร่น้ำตาลไทยเอกลักษณ์</div>
-                <span class="sys-tag">Finance & Report</span>
+                <div class="sys-name codename">FarmerAsset</div>
+                <div class="sys-desc">Security & Farmer Report Portal</div>
+                <span class="sys-tag">FINANCE & REPORT</span>
               </div>
             </div>
           </div>
@@ -1283,17 +1342,19 @@ body::after {
             <i class="fi fi-rr-angle-right cat-chevron"></i>
           </div>
           <div class="cat-items">
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/emailslip/','แจ้ง Email ขอสลิปเงินเดือน','fi fi-rr-envelope','rgba(45,212,160,0.1)','#2dd4a0','EMAIL')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/emailslip/','SlipMail — Payslip Request via Email','แจ้ง Email ขอสลิปเงินเดือน','fi fi-rr-envelope','rgba(45,212,160,0.1)','#2dd4a0','EMAIL · REQUEST')">
               <div class="sys-item-icon" style="background:rgba(45,212,160,0.1);"><i class="fi fi-rr-envelope" style="color:#2dd4a0;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">แจ้ง Email ขอสลิปเงินเดือน</div>
+                <div class="sys-name codename">SlipMail</div>
+                <div class="sys-desc">Payslip Request via Email</div>
                 <span class="sys-tag">EMAIL · REQUEST</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Tispayroll/','ขอไฟล์สลิปย้อนหลัง OTP Verify','fi fi-rr-file-invoice-dollar','rgba(232,168,32,0.1)','#e8a820','OTP·VERIFY')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Tispayroll/','SlipVault — Historical Payslip via OTP','ขอไฟล์สลิปย้อนหลัง ผ่าน OTP Verify','fi fi-rr-file-invoice-dollar','rgba(232,168,32,0.1)','#e8a820','OTP · VERIFY')">
               <div class="sys-item-icon" style="background:rgba(232,168,32,0.1);"><i class="fi fi-rr-file-invoice-dollar" style="color:#e8a820;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">ขอไฟล์สลิปย้อนหลัง</div>
+                <div class="sys-name codename">SlipVault</div>
+                <div class="sys-desc">Historical Payslip via OTP</div>
                 <span class="sys-tag">OTP · VERIFY</span>
               </div>
             </div>
@@ -1314,24 +1375,27 @@ body::after {
             <i class="fi fi-rr-angle-right cat-chevron"></i>
           </div>
           <div class="cat-items">
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/signhubtis/','อนุมัติหนังสือ Online E-Signature','fi fi-rr-pen-nib','rgba(157,114,255,0.1)','#9d72ff','E-SIGN')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/signhubtis/','SignFlow — Document Approval & e-Signature','อนุมัติหนังสือ ออนไลน์ E-Signature','fi fi-rr-pen-nib','rgba(157,114,255,0.1)','#9d72ff','E-APPROVAL')">
               <div class="sys-item-icon" style="background:rgba(157,114,255,0.1);"><i class="fi fi-rr-pen-nib" style="color:#9d72ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">อนุมัติหนังสือ Online E-Signature</div>
+                <div class="sys-name codename">SignFlow</div>
+                <div class="sys-desc">Document Approval & e-Signature</div>
                 <span class="sys-tag">E-APPROVAL</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tishome/','อัปโหลดเอกสารประชุม + QR Code','fi fi-rr-qrcode','rgba(56,182,255,0.1)','#38b6ff','QR·SHARE')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tishome/','PresentShare — Meeting Upload & QR','อัปโหลดเอกสารประชุม พร้อมสร้าง QR Code','fi fi-rr-qrcode','rgba(56,182,255,0.1)','#38b6ff','QR · SHARE')">
               <div class="sys-item-icon" style="background:rgba(56,182,255,0.1);"><i class="fi fi-rr-qrcode" style="color:#38b6ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">อัปโหลดเอกสารประชุม + สร้าง QR Code</div>
+                <div class="sys-name codename">PresentShare</div>
+                <div class="sys-desc">Meeting Upload & QR</div>
                 <span class="sys-tag">QR · SHARE</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tismeet/','จองห้องประชุม + LINE Notification','fi fi-rr-calendar-clock','rgba(45,212,160,0.1)','#2dd4a0','BOOKING')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tismeet/','RoomBook — Room Booking & Line Alert','จองห้องประชุม พร้อมแจ้งเตือนผ่าน LINE','fi fi-rr-calendar-clock','rgba(45,212,160,0.1)','#2dd4a0','BOOKING · LINE')">
               <div class="sys-item-icon" style="background:rgba(45,212,160,0.1);"><i class="fi fi-rr-calendar-clock" style="color:#2dd4a0;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">จองห้องประชุม + LINE Notification</div>
+                <div class="sys-name codename">RoomBook</div>
+                <div class="sys-desc">Room Booking & Line Alert</div>
                 <span class="sys-tag">BOOKING · LINE</span>
               </div>
             </div>
@@ -1352,39 +1416,44 @@ body::after {
             <i class="fi fi-rr-angle-right cat-chevron"></i>
           </div>
           <div class="cat-items">
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/PicRai/','อ้อยเข้า RealTime Scale & AutoMate','fi fi-rr-leaf','rgba(45,212,160,0.1)','#2dd4a0','REALTIME')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/PicRai/','CaneGate — Cane Intake & Auto-Class','อ้อยเข้า Real-Time ผ่านตาชั่ง','fi fi-rr-leaf','rgba(45,212,160,0.1)','#2dd4a0','REAL-TIME')">
               <div class="sys-item-icon" style="background:rgba(45,212,160,0.1);"><i class="fi fi-rr-leaf" style="color:#2dd4a0;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">อ้อยเข้า RealTime — Scale & AutoMate</div>
+                <div class="sys-name codename">CaneGate</div>
+                <div class="sys-desc">Cane Intake & Auto-Class</div>
                 <span class="sys-tag">REAL-TIME</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Dashtis/','Chemical-Lab ข้อมูลปีผลิตน้ำตาล','fi fi-rr-flask','rgba(240,98,146,0.1)','#f06292','CHEM·LAB')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Dashtis/','SugarLab Insight — Production Dashboard','วิเคราะห์ข้อมูลคุณภาพน้ำตาลจากห้องเคมี','fi fi-rr-flask','rgba(240,98,146,0.1)','#f06292','CHEM · LAB')">
               <div class="sys-item-icon" style="background:rgba(240,98,146,0.1);"><i class="fi fi-rr-flask" style="color:#f06292;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">Chemical-Lab ข้อมูลปีผลิตน้ำตาล</div>
+                <div class="sys-name codename">SugarLab Insight</div>
+                <div class="sys-desc">Production Dashboard · Chemical Lab</div>
                 <span class="sys-tag">CHEM · LAB</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/sugartis/','AI คาดการณ์วันหยุดหีบอ้อย','fi fi-rr-brain','rgba(157,114,255,0.1)','#9d72ff','AI·FORECAST')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/sugartis/','CrushCast AI — Season Closure Forecast','AI คาดการณ์วันหยุดหีบอ้อย','fi fi-rr-brain','rgba(157,114,255,0.1)','#9d72ff','AI · FORECAST')">
               <div class="sys-item-icon" style="background:rgba(157,114,255,0.1);"><i class="fi fi-rr-brain" style="color:#9d72ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">AI คาดการณ์วันหยุดหีบอ้อย</div>
-                <span class="sys-tag">AI · FORECAST</span>
+                <div class="sys-name codename">CrushCast AI</div>
+                <div class="sys-desc">Season Closure Forecast</div>
+                <span class="sys-tag ai-tag"><i class="fi fi-rr-sparkles"></i>AI · FORECAST</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/FiberTIS/','WatchDog รถใบอ้อยแยกลาน RealTime','fi fi-rr-eye','rgba(56,182,255,0.1)','#38b6ff','WATCHDOG')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/FiberTIS/','YardVision AI — Truck Routing & Yard Monitor','ตรวจสอบรถใบอ้อยภายในลาน Sync แบบ Real-Time','fi fi-rr-eye','rgba(56,182,255,0.1)','#38b6ff','AI · WATCHDOG')">
               <div class="sys-item-icon" style="background:rgba(56,182,255,0.1);"><i class="fi fi-rr-eye" style="color:#38b6ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">WatchDog รถใบอ้อยแยกลาน RealTime</div>
-                <span class="sys-tag">AI · WATCHDOG</span>
+                <div class="sys-name codename">YardVision AI</div>
+                <div class="sys-desc">Truck Routing & Yard Monitor</div>
+                <span class="sys-tag ai-tag"><i class="fi fi-rr-sparkles"></i>AI · WATCHDOG</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Aiexcel/','AI Excel Assistant — แนะนำสูตร & แก้ไขไฟล์อัจฉริยะ','fi fi-rr-file-spreadsheet','rgba(45,212,160,0.1)','#2dd4a0','AI·EXCEL')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Aiexcel/','AI Excel Assistant — Smart Formula & File Advisor','สอบถามสูตร พร้อมแก้ไขไฟล์ Excel อัจฉริยะ','fi fi-rr-file-spreadsheet','rgba(45,212,160,0.1)','#2dd4a0','AI · EXCEL')">
               <div class="sys-item-icon" style="background:rgba(45,212,160,0.1);"><i class="fi fi-rr-file-spreadsheet" style="color:#2dd4a0;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">AI Excel — แนะนำสูตร & แก้ไขไฟล์อัจฉริยะ</div>
-                <span class="sys-tag">AI · EXCEL</span>
+                <div class="sys-name codename">AI Excel Assistant</div>
+                <div class="sys-desc">Smart Formula & File Advisor</div>
+                <span class="sys-tag ai-tag"><i class="fi fi-rr-sparkles"></i>AI · EXCEL</span>
               </div>
             </div>
           </div>
@@ -1404,45 +1473,50 @@ body::after {
             <i class="fi fi-rr-angle-right cat-chevron"></i>
           </div>
           <div class="cat-items">
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Carcheck/','เช็คเข้า-ออก พนักงาน Online Analysis','fi fi-rr-time-check','rgba(56,182,255,0.1)','#38b6ff','ATTENDANCE')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Carcheck/','AttendanceCore — Staff Check-In/Out & Analytics','เช็คเข้า-ออกพนักงาน พร้อมวิเคราะห์ออนไลน์','fi fi-rr-time-check','rgba(56,182,255,0.1)','#38b6ff','ATTENDANCE')">
               <div class="sys-item-icon" style="background:rgba(56,182,255,0.1);"><i class="fi fi-rr-time-check" style="color:#38b6ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">เช็คเข้า-ออก พนักงาน Online</div>
+                <div class="sys-name codename">AttendanceCore</div>
+                <div class="sys-desc">Staff Check-In/Out & Analytics</div>
                 <span class="sys-tag">ATTENDANCE</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/checkin/','ลงเวลาเข้างาน GPS Auto Real-Time','fi fi-rr-map-marker','rgba(45,212,160,0.1)','#2dd4a0','GPS·AUTO')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/checkin/','GeoTime — Workforce Time & Real GPS','ลงเวลาเข้างาน ด้วย GPS จริง','fi fi-rr-map-marker','rgba(45,212,160,0.1)','#2dd4a0','GPS · BIO')">
               <div class="sys-item-icon" style="background:rgba(45,212,160,0.1);"><i class="fi fi-rr-map-marker" style="color:#2dd4a0;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">ลงเวลาเข้างาน GPS Auto Real-Time</div>
+                <div class="sys-name codename">GeoTime</div>
+                <div class="sys-desc">Workforce Time & Real GPS</div>
                 <span class="sys-tag">GPS · BIO</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Cartis/','จองรถโรงงาน + วิเคราะห์ค่าใช้จ่าย','fi fi-rr-car-alt','rgba(232,168,32,0.1)','#e8a820','FLEET')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/Cartis/','FleetRequest — Vehicle Booking & Cost Analytics','จองรถโรงงาน พร้อมวิเคราะห์ค่าใช้จ่าย','fi fi-rr-car-alt','rgba(232,168,32,0.1)','#e8a820','FLEET · COST')">
               <div class="sys-item-icon" style="background:rgba(232,168,32,0.1);"><i class="fi fi-rr-car-alt" style="color:#e8a820;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">จองรถโรงงาน + วิเคราะห์ค่าใช้จ่าย</div>
+                <div class="sys-name codename">FleetRequest</div>
+                <div class="sys-desc">Vehicle Booking & Cost Analytics</div>
                 <span class="sys-tag">FLEET · COST</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/helptis/','แจ้งซ่อม IT — Ticket + AI Maintenance','fi fi-rr-computer','rgba(157,114,255,0.1)','#9d72ff','HELPDESK')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/helptis/','ITDesk — IT Ticket & AI Maintenance','แจ้งซ่อมอุปกรณ์ IT ภายในโรงงาน','fi fi-rr-computer','rgba(157,114,255,0.1)','#9d72ff','HELPDESK · AI')">
               <div class="sys-item-icon" style="background:rgba(157,114,255,0.1);"><i class="fi fi-rr-computer" style="color:#9d72ff;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">แจ้งซ่อม IT — Ticket + AI Maintenance</div>
-                <span class="sys-tag">HELPDESK · AI</span>
+                <div class="sys-name codename">ITDesk</div>
+                <div class="sys-desc">IT Ticket & AI Maintenance</div>
+                <span class="sys-tag ai-tag"><i class="fi fi-rr-sparkles"></i>HELPDESK · AI</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/salesystem/','หน้าร้าน Tool องค์กร + AI Upload','fi fi-rr-shop','rgba(255,107,107,0.1)','#ff6b6b','STORE')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/salesystem/','หน้าร้าน Tool องค์กร','หน้าร้าน Tool องค์กร + AI Upload','fi fi-rr-shop','rgba(255,107,107,0.1)','#ff6b6b','STORE · AI')">
               <div class="sys-item-icon" style="background:rgba(255,107,107,0.1);"><i class="fi fi-rr-shop" style="color:#ff6b6b;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">หน้าร้าน Tool องค์กร + AI Upload</div>
-                <span class="sys-tag">STORE · AI</span>
+                <div class="sys-name">หน้าร้าน Tool องค์กร</div>
+                <span class="sys-tag ai-tag"><i class="fi fi-rr-sparkles"></i>STORE · AI</span>
               </div>
             </div>
-            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tistalk/','TIS Talk — Remote ห้องชั่ง แก้ไขรถติดหน้างาน','fi fi-rr-walkie-talkie','rgba(255,107,107,0.1)','#ff6b6b','REMOTE·OPS')">
+            <div class="sys-item" onclick="loadSys(this,'https://skywalker698.github.io/tistalk/','ScaleWatch — Weighbridge Override & Standby','แก้ไขปัญหาห้องชั่ง Remote แบบ 24/7','fi fi-rr-walkie-talkie','rgba(255,107,107,0.1)','#ff6b6b','REMOTE · OPS')">
               <div class="sys-item-icon" style="background:rgba(255,107,107,0.1);"><i class="fi fi-rr-walkie-talkie" style="color:#ff6b6b;"></i></div>
               <div class="sys-info">
-                <div class="sys-name">TIS Talk — Remote ห้องชั่ง แก้ไขรถติดหน้างาน</div>
+                <div class="sys-name codename">ScaleWatch</div>
+                <div class="sys-desc">Weighbridge Override & Standby</div>
                 <span class="sys-tag">REMOTE · OPS</span>
               </div>
             </div>
@@ -1489,7 +1563,7 @@ body::after {
               <div class="stat-icon" style="background:rgba(232,168,32,0.12);">
                 <i class="fi fi-rr-apps" style="color:#e8a820;font-size:0.9rem;"></i>
               </div>
-              <div class="stat-val" style="background:linear-gradient(135deg,#e8a820,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">23</div>
+              <div class="stat-val" style="background:linear-gradient(135deg,#e8a820,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">24</div>
               <div class="stat-lbl">SYSTEMS</div>
             </div>
             <div class="stat-card cyan-stat">
@@ -1541,12 +1615,12 @@ const SHEET_ID = '1d9heXjqVSKvguPQM00KMErlLEjxzLq7xc3wLYx5Lp1I';
 const LOGIN_SH = 'Login';
 
 const QUICK = [
-  { icon:'fi fi-rr-leaf',               color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'อ้อยเข้า RealTime',     url:'https://skywalker698.github.io/PicRai/',    title:'อ้อยเข้า RealTime — Scale & AutoMate' },
-  { icon:'fi fi-rr-brain',              color:'#9d72ff', bg:'rgba(157,114,255,0.12)', name:'AI คาดการณ์หยุดหีบ',    url:'https://skywalker698.github.io/sugartis/',  title:'AI คาดการณ์วันหยุดหีบอ้อย' },
-  { icon:'fi fi-rr-computer',           color:'#9d72ff', bg:'rgba(157,114,255,0.12)', name:'แจ้งซ่อม IT',           url:'https://skywalker698.github.io/helptis/',   title:'แจ้งซ่อม IT — Ticket + AI Maintenance' },
-  { icon:'fi fi-rr-calendar-clock',     color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'จองห้องประชุม',          url:'https://skywalker698.github.io/tismeet/',   title:'จองห้องประชุม + LINE Notification' },
-  { icon:'fi fi-rr-file-invoice-dollar',color:'#e8a820', bg:'rgba(232,168,32,0.12)',  name:'สลิปเงินเดือน',         url:'https://skywalker698.github.io/Tispayroll/',title:'ขอไฟล์สลิปย้อนหลัง OTP Verify' },
-  { icon:'fi fi-rr-car-alt',            color:'#e8a820', bg:'rgba(232,168,32,0.12)',  name:'จองรถโรงงาน',           url:'https://skywalker698.github.io/Cartis/',    title:'จองรถโรงงาน + วิเคราะห์ค่าใช้จ่าย' },
+  { icon:'fi fi-rr-leaf',               color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'CaneGate',        desc:'Cane Intake & Auto-Class',           url:'https://skywalker698.github.io/PicRai/',     title:'CaneGate — Cane Intake & Auto-Class',           thaiDesc:'อ้อยเข้า Real-Time ผ่านตาชั่ง' },
+  { icon:'fi fi-rr-brain',              color:'#9d72ff', bg:'rgba(157,114,255,0.12)', name:'CrushCast AI',    desc:'Season Closure Forecast',            url:'https://skywalker698.github.io/sugartis/',   title:'CrushCast AI — Season Closure Forecast',        thaiDesc:'AI คาดการณ์วันหยุดหีบอ้อย' },
+  { icon:'fi fi-rr-computer',           color:'#9d72ff', bg:'rgba(157,114,255,0.12)', name:'ITDesk',          desc:'IT Ticket & AI Maintenance',         url:'https://skywalker698.github.io/helptis/',    title:'ITDesk — IT Ticket & AI Maintenance',           thaiDesc:'แจ้งซ่อมอุปกรณ์ IT ภายในโรงงาน' },
+  { icon:'fi fi-rr-calendar-clock',     color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'RoomBook',        desc:'Room Booking & Line Alert',          url:'https://skywalker698.github.io/tismeet/',    title:'RoomBook — Room Booking & Line Alert',          thaiDesc:'จองห้องประชุม พร้อมแจ้งเตือนผ่าน LINE' },
+  { icon:'fi fi-rr-file-invoice-dollar',color:'#e8a820', bg:'rgba(232,168,32,0.12)',  name:'SlipVault',       desc:'Historical Payslip via OTP',         url:'https://skywalker698.github.io/Tispayroll/', title:'SlipVault — Historical Payslip via OTP',        thaiDesc:'ขอไฟล์สลิปย้อนหลัง ผ่าน OTP Verify' },
+  { icon:'fi fi-rr-car-alt',            color:'#e8a820', bg:'rgba(232,168,32,0.12)',  name:'FleetRequest',    desc:'Vehicle Booking & Cost Analytics',   url:'https://skywalker698.github.io/Cartis/',     title:'FleetRequest — Vehicle Booking & Cost Analytics',thaiDesc:'จองรถโรงงาน พร้อมวิเคราะห์ค่าใช้จ่าย' },
 ];
 
 // ═══ STATE ═════════════════════════════════════════════════════════════
@@ -1629,9 +1703,10 @@ function showPortal() {
 
 function buildQuick() {
   document.getElementById('quickGrid').innerHTML = QUICK.map(s =>
-    `<div class="quick-card" onclick="loadSysByQuick('${s.url}','${s.title}','${s.icon}','${s.bg}','${s.color}')">
+    `<div class="quick-card" onclick="loadSysByQuick('${s.url}','${s.title}','${s.thaiDesc}','${s.icon}','${s.bg}','${s.color}')">
       <div class="qcard-icon" style="background:${s.bg};"><i class="${s.icon}" style="color:${s.color};font-size:1rem;"></i></div>
       <div class="qcard-name">${s.name}</div>
+      <div class="qcard-desc">${s.desc}</div>
       <div class="qcard-arrow"><i class="fi fi-rr-arrow-right"></i></div>
     </div>`
   ).join('');
@@ -1661,14 +1736,16 @@ function resetContent() {
 }
 
 // ═══ LOAD SYSTEM ═══════════════════════════════════════════════════════
-function loadSys(el, url, title, iconCls, iconBg, iconColor, tag) {
+// thaiDesc = short Thai description shown in the content bar (replaces the
+// raw URL so the person can tell what the system does, not just where it lives)
+function loadSys(el, url, title, thaiDesc, iconCls, iconBg, iconColor, tag) {
 
   if (activeItem) activeItem.classList.remove('active');
 
   el.classList.add('active');
   activeItem = el;
 
-  _openSys(url, title, iconCls, iconBg, iconColor);
+  _openSys(url, title, thaiDesc, iconCls, iconBg, iconColor);
 
   const iframe = document.getElementById('sysIframe');
 
@@ -1680,7 +1757,7 @@ function loadSys(el, url, title, iconCls, iconBg, iconColor, tag) {
   if (window.innerWidth <= 768) closeSidebar();
 }
 
-function loadSysByQuick(url, title, iconCls, iconBg, iconColor) {
+function loadSysByQuick(url, title, thaiDesc, iconCls, iconBg, iconColor) {
   if (activeItem) activeItem.classList.remove('active');
   document.querySelectorAll('.sys-item').forEach(it => {
     if (it.getAttribute('onclick')?.includes(url)) {
@@ -1688,15 +1765,15 @@ function loadSysByQuick(url, title, iconCls, iconBg, iconColor) {
       activeItem = it;
     }
   });
-  _openSys(url, title, iconCls, iconBg, iconColor);
+  _openSys(url, title, thaiDesc, iconCls, iconBg, iconColor);
 }
 
-function _openSys(url, title, iconCls, iconBg, iconColor) {
+function _openSys(url, title, thaiDesc, iconCls, iconBg, iconColor) {
   const cIcon = document.getElementById('cIcon');
   cIcon.style.background = iconBg || 'rgba(232,168,32,0.1)';
   cIcon.innerHTML = `<i class="${iconCls}" style="color:${iconColor || '#e8a820'};"></i>`;
   document.getElementById('cTitle').textContent = title;
-  document.getElementById('cSub').textContent = url.replace('https://','');
+  document.getElementById('cSub').textContent = thaiDesc || url.replace('https://','');
   setStatus('loading');
 
   document.getElementById('welcomeScreen').style.display = 'none';
@@ -1714,7 +1791,7 @@ function _openSys(url, title, iconCls, iconBg, iconColor) {
     document.getElementById('pageLoader').style.display = 'none';
     iframe.style.display = 'block';
     setStatus('ready');
-    document.getElementById('cSub').textContent = 'ระบบพร้อมใช้งาน';
+    document.getElementById('cSub').textContent = thaiDesc ? `${thaiDesc} · พร้อมใช้งาน` : 'ระบบพร้อมใช้งาน';
   };
   iframe.onerror = () => {
     document.getElementById('pageLoader').style.display = 'none';
@@ -1758,11 +1835,15 @@ function closeSidebar() {
 }
 
 // ═══ SEARCH ════════════════════════════════════════════════════════════
+// Matches against the codename, the English subtitle, and the legacy
+// sys-name text together, so searching in Thai or English both work.
 function doSearch(q) {
   q = q.trim().toLowerCase();
   document.querySelectorAll('.sys-item').forEach(item => {
-    const txt = item.querySelector('.sys-name').textContent.toLowerCase();
-    item.classList.toggle('search-hidden', q.length > 0 && !txt.includes(q));
+    const nameTxt = item.querySelector('.sys-name')?.textContent.toLowerCase() || '';
+    const descTxt = item.querySelector('.sys-desc')?.textContent.toLowerCase() || '';
+    const match = (nameTxt + ' ' + descTxt).includes(q);
+    item.classList.toggle('search-hidden', q.length > 0 && !match);
   });
   if (q.length > 0) {
     document.querySelectorAll('.cat-group').forEach(group => {
