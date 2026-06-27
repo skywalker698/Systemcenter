@@ -1764,6 +1764,8 @@ function logout() {
   document.querySelectorAll('.cat-trigger').forEach(t => t.classList.remove('open'));
   document.querySelectorAll('.cat-items').forEach(i => i.classList.remove('open'));
   document.querySelectorAll('.sys-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('sideSearch').value = '';
+  document.querySelectorAll('.sys-item.search-hidden').forEach(i => i.classList.remove('search-hidden'));
 }
 
 function resetContent() {
@@ -1799,11 +1801,9 @@ function loadSysByQuick(url, title, thaiDesc, iconCls, iconBg, iconColor) {
 
 function _openSys(url, title, thaiDesc, iconCls, iconBg, iconColor) {
   const cIcon = document.getElementById('cIcon');
-  // resolve CSS var() strings if needed
-  const bg = iconBg.startsWith('var(') ? getComputedStyle(document.documentElement).getPropertyValue(iconBg.slice(4,-1).trim()) : iconBg;
-  const clr = iconColor.startsWith('var(') ? getComputedStyle(document.documentElement).getPropertyValue(iconColor.slice(4,-1).trim()) : iconColor;
-  cIcon.style.background = bg || 'rgba(232,168,32,0.1)';
-  cIcon.innerHTML = `<i class="${iconCls}" style="color:${clr || '#e8a820'};"></i>`;
+  // Browsers support CSS var() natively in inline styles — no need for getComputedStyle
+  cIcon.style.background = iconBg || 'rgba(232,168,32,0.1)';
+  cIcon.innerHTML = `<i class="${iconCls}" style="color:${iconColor || '#e8a820'};"></i>`;
   document.getElementById('cTitle').textContent = title;
   document.getElementById('cSub').textContent = thaiDesc || url.replace('https://','');
   setStatus('loading');
@@ -1875,13 +1875,21 @@ function doSearch(q) {
     const match = (nameTxt + ' ' + descTxt).includes(q);
     item.classList.toggle('search-hidden', q.length > 0 && !match);
   });
-  if (q.length > 0) {
-    document.querySelectorAll('.cat-group').forEach(group => {
+  document.querySelectorAll('.cat-group').forEach(group => {
+    const trigger = group.querySelector('.cat-trigger');
+    const items   = group.querySelector('.cat-items');
+    if (q.length > 0) {
+      // Expand only groups that have matching results
       const visible = [...group.querySelectorAll('.sys-item')].some(i => !i.classList.contains('search-hidden'));
-      group.querySelector('.cat-trigger').classList.toggle('open', visible);
-      group.querySelector('.cat-items').classList.toggle('open', visible);
-    });
-  }
+      trigger.classList.toggle('open', visible);
+      items.classList.toggle('open', visible);
+    } else {
+      // Query cleared — restore: keep open only the group that has the active item
+      const hasActive = group.querySelector('.sys-item.active') !== null;
+      trigger.classList.toggle('open', hasActive);
+      items.classList.toggle('open', hasActive);
+    }
+  });
 }
 
 // ═══ ANALYTICS ═════════════════════════════════════════════════════════
