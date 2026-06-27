@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>TIS Portal — ระบบสารสนเทศ</title>
+<title>TIS Portal — ศูนย์เครื่องมือกลางสารสนเทศ SugarTis-IT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
@@ -1650,34 +1650,34 @@ body::after {
 </div>
 
 <script>
-// ═══ CONFIG ════════════════════════════════════════════════════════════
 const GAS_URL  = 'https://script.google.com/macros/s/AKfycbzznmLdM02ohPtDLwms0GCv67b97srHVUun05eHY93JipPqpLAMlRCFJPa9Vkx_b76fzQ/exec';
 const SHEET_ID = '1d9heXjqVSKvguPQM00KMErlLEjxzLq7xc3wLYx5Lp1I';
 const LOGIN_SH = 'Login';
 
 const QUICK = [
-  { icon:'fi fi-rr-leaf',               color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'CaneGate',        desc:'Cane Intake & Auto-Class',           url:'https://skywalker698.github.io/PicRai/',     title:'CaneGate — Cane Intake & Auto-Class',           thaiDesc:'อ้อยเข้า Real-Time ผ่านตาชั่ง' },
-  { icon:'fi fi-rr-brain',              color:'#f5c842', bg:'rgba(245,200,66,0.12)',  name:'CrushCast AI',    desc:'Season Closure Forecast',            url:'https://skywalker698.github.io/sugartis/',   title:'CrushCast AI — Season Closure Forecast',        thaiDesc:'AI คาดการณ์วันหยุดหีบอ้อย' },
-  { icon:'fi fi-rr-computer',           color:'#ff8a70', bg:'rgba(255,138,112,0.12)', name:'ITDesk',          desc:'IT Ticket & AI Maintenance',         url:'https://skywalker698.github.io/helptis/',    title:'ITDesk — IT Ticket & AI Maintenance',           thaiDesc:'แจ้งซ่อมอุปกรณ์ IT ภายในโรงงาน' },
-  { icon:'fi fi-rr-calendar-clock',     color:'#a78bfa', bg:'rgba(167,139,250,0.12)', name:'RoomBook',        desc:'Room Booking & Line Alert',          url:'https://skywalker698.github.io/tismeet/',    title:'RoomBook — Room Booking & Line Alert',          thaiDesc:'จองห้องประชุม พร้อมแจ้งเตือนผ่าน LINE' },
-  { icon:'fi fi-rr-file-invoice-dollar',color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'SlipVault',       desc:'Historical Payslip via OTP',         url:'https://skywalker698.github.io/Tispayroll/', title:'SlipVault — Historical Payslip via OTP',        thaiDesc:'ขอไฟล์สลิปย้อนหลัง ผ่าน OTP Verify' },
-  { icon:'fi fi-rr-car-alt',            color:'#ff8a70', bg:'rgba(255,138,112,0.12)', name:'FleetRequest',    desc:'Vehicle Booking & Cost Analytics',   url:'https://skywalker698.github.io/Cartis/',     title:'FleetRequest — Vehicle Booking & Cost Analytics',thaiDesc:'จองรถโรงงาน พร้อมวิเคราะห์ค่าใช้จ่าย' },
+  { icon:'fi fi-rr-leaf',                color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'CaneGate',      desc:'Cane Intake & Auto-Class',            url:'https://skywalker698.github.io/PicRai/',     title:'CaneGate — Cane Intake & Auto-Class',            thaiDesc:'อ้อยเข้า Real-Time ผ่านตาชั่ง' },
+  { icon:'fi fi-rr-brain',               color:'#f5c842', bg:'rgba(245,200,66,0.12)',  name:'CrushCast AI',  desc:'Season Closure Forecast',             url:'https://skywalker698.github.io/sugartis/',   title:'CrushCast AI — Season Closure Forecast',         thaiDesc:'AI คาดการณ์วันหยุดหีบอ้อย' },
+  { icon:'fi fi-rr-computer',            color:'#ff8a70', bg:'rgba(255,138,112,0.12)', name:'ITDesk',        desc:'IT Ticket & AI Maintenance',          url:'https://skywalker698.github.io/helptis/',    title:'ITDesk — IT Ticket & AI Maintenance',            thaiDesc:'แจ้งซ่อมอุปกรณ์ IT ภายในโรงงาน' },
+  { icon:'fi fi-rr-calendar-clock',      color:'#a78bfa', bg:'rgba(167,139,250,0.12)', name:'RoomBook',      desc:'Room Booking & Line Alert',           url:'https://skywalker698.github.io/tismeet/',    title:'RoomBook — Room Booking & Line Alert',           thaiDesc:'จองห้องประชุม พร้อมแจ้งเตือนผ่าน LINE' },
+  { icon:'fi fi-rr-file-invoice-dollar', color:'#2dd4a0', bg:'rgba(45,212,160,0.12)',  name:'SlipVault',     desc:'Historical Payslip via OTP',          url:'https://skywalker698.github.io/Tispayroll/', title:'SlipVault — Historical Payslip via OTP',         thaiDesc:'ขอไฟล์สลิปย้อนหลัง ผ่าน OTP Verify' },
+  { icon:'fi fi-rr-car-alt',             color:'#ff8a70', bg:'rgba(255,138,112,0.12)', name:'FleetRequest',  desc:'Vehicle Booking & Cost Analytics',    url:'https://skywalker698.github.io/Cartis/',     title:'FleetRequest — Vehicle Booking & Cost Analytics',thaiDesc:'จองรถโรงงาน พร้อมวิเคราะห์ค่าใช้จ่าย' },
 ];
 
-// ═══ STATE ═════════════════════════════════════════════════════════════
-let me = null, activeItem = null;
+let me = null, activeItem = null, statsTimer = null, loginInProgress = false;
 const sid = 'ses_' + Math.random().toString(36).slice(2,8) + '_' + Date.now();
 const t0  = Date.now();
 
-// ═══ LOGIN ═════════════════════════════════════════════════════════════
 function doLogin() {
+  if (loginInProgress) return;
   const uid = document.getElementById('userId').value.trim();
   const pwd = document.getElementById('password').value.trim();
   const btn = document.getElementById('loginBtn');
   if (!uid || !pwd) return showErr('กรุณากรอกข้อมูลให้ครบถ้วน');
+  loginInProgress = true;
   btn.disabled = true;
   btn.innerHTML = '<div class="spin-xs"></div> กำลังตรวจสอบ…';
   checkCreds(uid, pwd).then(r => {
+    loginInProgress = false;
     btn.disabled = false;
     btn.innerHTML = '<i class="fi fi-rr-sign-in-alt"></i> เข้าสู่ระบบ';
     if (r.ok) { me = r.user; ping('login', { uid: r.user.id }); showPortal(); }
@@ -1725,7 +1725,6 @@ function checkCreds(uid, pwd) {
   });
 }
 
-// ═══ PORTAL ════════════════════════════════════════════════════════════
 function showPortal() {
   document.getElementById('loginScreen').style.display = 'none';
   const p = document.getElementById('portalScreen');
@@ -1735,7 +1734,8 @@ function showPortal() {
   document.getElementById('userAvatar').textContent = nm.charAt(0).toUpperCase();
   buildQuick();
   loadStats();
-  setInterval(loadStats, 5 * 60 * 1000);
+  clearInterval(statsTimer);
+  statsTimer = setInterval(loadStats, 5 * 60 * 1000);
   document.querySelectorAll('.cat-trigger').forEach(c => {
     if (c.closest('.cat-group').dataset.cat === 'dash') toggleCat(c);
   });
@@ -1754,6 +1754,8 @@ function buildQuick() {
 
 function logout() {
   if (!confirm('ต้องการออกจากระบบหรือไม่?')) return;
+  clearInterval(statsTimer);
+  statsTimer = null;
   me = null; activeItem = null;
   document.getElementById('portalScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
@@ -1777,14 +1779,12 @@ function resetContent() {
   setStatus('ready');
 }
 
-// ═══ LOAD SYSTEM ═══════════════════════════════════════════════════════
-function loadSys(el, url, title, thaiDesc, iconCls, iconBg, iconColor, tag) {
+function loadSys(el, url, title, thaiDesc, iconCls, iconBg, iconColor) {
   if (activeItem) activeItem.classList.remove('active');
   el.classList.add('active');
   activeItem = el;
   _openSys(url, title, thaiDesc, iconCls, iconBg, iconColor);
-  const iframe = document.getElementById('sysIframe');
-  iframe.style.pointerEvents = url.includes('/subsin/') ? 'none' : 'auto';
+  document.getElementById('sysIframe').style.pointerEvents = url.includes('/subsin/') ? 'none' : 'auto';
   if (window.innerWidth <= 768) closeSidebar();
 }
 
@@ -1801,34 +1801,32 @@ function loadSysByQuick(url, title, thaiDesc, iconCls, iconBg, iconColor) {
 
 function _openSys(url, title, thaiDesc, iconCls, iconBg, iconColor) {
   const cIcon = document.getElementById('cIcon');
-  // Browsers support CSS var() natively in inline styles — no need for getComputedStyle
   cIcon.style.background = iconBg || 'rgba(232,168,32,0.1)';
   cIcon.innerHTML = `<i class="${iconCls}" style="color:${iconColor || '#e8a820'};"></i>`;
   document.getElementById('cTitle').textContent = title;
   document.getElementById('cSub').textContent = thaiDesc || url.replace('https://','');
   setStatus('loading');
-
   document.getElementById('welcomeScreen').style.display = 'none';
   document.getElementById('sysIframe').style.display = 'none';
   document.getElementById('pageLoader').style.display = 'flex';
-
   ping('open', { url, title });
-
   const iframe = document.getElementById('sysIframe');
+  iframe.onload = null;
   iframe.src = 'about:blank';
-  setTimeout(() => { iframe.src = url; }, 80);
-
-  iframe.onload = () => {
-    if (iframe.src === 'about:blank') return;
-    document.getElementById('pageLoader').style.display = 'none';
-    iframe.style.display = 'block';
-    setStatus('ready');
-    document.getElementById('cSub').textContent = thaiDesc ? `${thaiDesc} · พร้อมใช้งาน` : 'ระบบพร้อมใช้งาน';
-  };
-  iframe.onerror = () => {
-    document.getElementById('pageLoader').style.display = 'none';
-    resetContent();
-  };
+  setTimeout(() => {
+    iframe.src = url;
+    iframe.onload = () => {
+      if (iframe.src === 'about:blank') return;
+      document.getElementById('pageLoader').style.display = 'none';
+      iframe.style.display = 'block';
+      setStatus('ready');
+      document.getElementById('cSub').textContent = thaiDesc ? `${thaiDesc} · พร้อมใช้งาน` : 'ระบบพร้อมใช้งาน';
+    };
+    iframe.onerror = () => {
+      document.getElementById('pageLoader').style.display = 'none';
+      resetContent();
+    };
+  }, 80);
 }
 
 function setStatus(s) {
@@ -1842,7 +1840,6 @@ function setStatus(s) {
   }
 }
 
-// ═══ SIDEBAR ═══════════════════════════════════════════════════════════
 function toggleCat(trigger) {
   const isOpen = trigger.classList.contains('open');
   document.querySelectorAll('.cat-trigger').forEach(t => t.classList.remove('open'));
@@ -1866,25 +1863,21 @@ function closeSidebar() {
   document.getElementById('overlay').classList.remove('active');
 }
 
-// ═══ SEARCH ════════════════════════════════════════════════════════════
 function doSearch(q) {
   q = q.trim().toLowerCase();
   document.querySelectorAll('.sys-item').forEach(item => {
     const nameTxt = item.querySelector('.sys-name')?.textContent.toLowerCase() || '';
     const descTxt = item.querySelector('.sys-desc')?.textContent.toLowerCase() || '';
-    const match = (nameTxt + ' ' + descTxt).includes(q);
-    item.classList.toggle('search-hidden', q.length > 0 && !match);
+    item.classList.toggle('search-hidden', q.length > 0 && !(nameTxt + ' ' + descTxt).includes(q));
   });
   document.querySelectorAll('.cat-group').forEach(group => {
     const trigger = group.querySelector('.cat-trigger');
     const items   = group.querySelector('.cat-items');
     if (q.length > 0) {
-      // Expand only groups that have matching results
       const visible = [...group.querySelectorAll('.sys-item')].some(i => !i.classList.contains('search-hidden'));
       trigger.classList.toggle('open', visible);
       items.classList.toggle('open', visible);
     } else {
-      // Query cleared — restore: keep open only the group that has the active item
       const hasActive = group.querySelector('.sys-item.active') !== null;
       trigger.classList.toggle('open', hasActive);
       items.classList.toggle('open', hasActive);
@@ -1892,7 +1885,6 @@ function doSearch(q) {
   });
 }
 
-// ═══ ANALYTICS ═════════════════════════════════════════════════════════
 function ping(action, extra = {}) {
   try {
     fetch(GAS_URL, {
@@ -1913,7 +1905,6 @@ async function loadStats() {
   } catch {}
 }
 
-// ═══ EVENTS ════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loginBtn').onclick = doLogin;
   document.getElementById('userId').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('password').focus(); });
